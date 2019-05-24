@@ -1,0 +1,43 @@
+/**
+ * A standalone suite of libraries to be consumed by disparate applications.
+ *
+ * Copyright (C) 2019 lingocoder <plugins@lingocoder.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.lingocoder.poc;
+
+import java.util.Collection;
+
+import org.apache.commons.math.random.EmpiricalDistribution;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.TransactionOutput;
+import org.bitcoinj.wallet.CoinSelection;
+
+import de.huxhorn.sulky.generics.Wrapper;
+import jp.dodododo.janerics.exception.UnsupportedTypeException;
+
+public class Frankenstein extends CoinSelection {
+
+	public Frankenstein( Coin valueGathered,
+			Collection<TransactionOutput> gathered ) {
+		super( valueGathered, gathered );
+	}
+
+	public Wrapper m( EmpiricalDistribution randomParam )
+			throws UnsupportedTypeException {
+
+		return null;
+	}
+}
