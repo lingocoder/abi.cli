@@ -13,7 +13,7 @@ plugins {
 }
 
 group = 'com.lingocoder'
-version = '0.4.6'
+version = '0.4.7'
 description = "A command line application that scans a Java library and detects whether the library exposes types from its dependencies to the library's consumers."
 
 repositories{
@@ -32,7 +32,7 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     testImplementation 'org.apache.commons:commons-lang3:3.5'
 
-    implementation 'com.lingocoder:lingocoder.core:0.4.6'
+    implementation 'com.lingocoder:lingocoder.core:0.4.7'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
