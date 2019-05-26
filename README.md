@@ -1,43 +1,157 @@
 # Application Binary Interface (ABI) Inspector
 
-The ABI Inspector is a command line application that scans the API of a Java library to detect whether the library exposes types from its dependencies to the library consumers' runtime classpath. That's known as „*dependency leakage*“.
+The ABI Inspector (*ABI*) is a command line application that scans the API of a Java library to detect whether the library exposes types from its dependencies to the library consumers' runtime classpath. That's known as „*dependency leakage*“.
 
 ## Usage
 
 *Requires JDK 11+*
 
-Please, don't let the long-winded wall of text below intimidate you. The ABI Inspector is very simple to use. To have it scan your library's API, the following input must be provided to the tool:
+I admit this README is sorta on the verbose side. But please don't let that intimidate you. The tool is actually pretty easy to use.
 
-    java -cp <your_library's_class_path...> com.lingocoder.abi.app.AbiApp -c <classes-dir>  -p <package-to-scan> -a <artifacts-gav-file> -d <dependencies-file>
+## Run ABI Using The JarExec Gradle Plugin
 
-1. The runtime dependencies required by your library. These must be included in this tool's classpath (*`-cp <your_library's_class_path...>`*)
-2. The absolute path of the root directory of your library's classes (*`-c <classes-dir>`*). For example: `target/classes`
-3. A list of packages of which your library's classes are members (*`-p <package-to-scan>`*) For example: `com.example.my.api`
-4. The absolute path to a file that contains a list of Maven-style *`G:A:V`* module identifiers of your library's dependencies (*`-a <artifacts-gav-file>`*)
-5. The absolute path to a file that contains a list of absolute paths to your library's dependencies (*`-d <dependencies-file>`*)
+Although ABI is a standalone Java application, it might be more convenient to use it within a Gradle build script. An ABI Gradle plugin is in the works. But in the meantime, [*I have just the plugin*](http://bit.ly/JarExecPi) that would allow you to do an ABI scan of your library's API from within a Gradle build; today.
+
+General steps for using the JarExec plugin are [*here*](http://bit.ly/JarExecSteps). But to set it up specifically to run the ABI tool, [*it needs certain input*](#abi-command-options). You need to:
+
+1. Add [*`'com.lingocoder:abi.cli:n.n.n'`*](http://bit.ly/abiCLImvn) as a dependency in your build script
+2. Set the options that ABI requires as the value of the *`args`* property of the JarExec task
+3. Set *`com.lingocoder.abi.app.AbiApp`* as the value of the *`mainClass`* property of the JarExec task
+4. Set the value of the *`classPath`* property of the JarExec task to the Gradle build configuration that contains the abi-cli dependency. The *`classPath`* property also needs to include any other runtime dependencies required by your library.
+
+
+        plugins{
+            id 'java-library'
+            id 'com.lingocoder.jarexec' version '0.4.7'    
+        }
+        ...
+        dependencies{
+
+            ...
+            
+            implementation group: 'com.lingocoder', name: 'abi.cli', version: '0.4.7'
+ 
+            implementation files("L:\\ingocoder\\classes\\")
+            ...
+        }
+        ...    
+        jarexec{
+    
+            /* (i) A list of arguments and options the main class needs */
+
+            def abiGavInput = file("L:\\ingocoder\\input\\files\\abi.gav.coordinates.1.txt")
+
+            args = [
+                "-a", abiGavInput.absolutePath,
+                "-c", "L:\\ingocoder\\classes\\", 
+                "-d", "L:\\ingocoder\\input\\files\\abi.dependencies.paths.1.txt",
+                "-p", "com.lingocoder.poc"]
+
+            /* (ii) The class path the main class needs. This is configurable by adding what your main
+             * class requires (including directories) to whatever configuration that works for you */
+
+            classpath = configurations.default
+
+            /* (iii) Configure jarexec's 'jar' property with your executable jar. */
+
+            jar = jarhelper.fetch('com.lingocoder:abi.cli:0.4.7').orElse('build/libs/abi.cli-0.4.7.jar')
+
+            /* (iv) Configure jarexec's 'watchInFile' property with your input file. */
+
+            mainClass = 'com.lingocoder.abi.app.AbiApp'
+
+            /* (v) Tell Gradle to watch for changes to the input file. You leverage
+             * the incremental build feature this way. */
+
+            watchInFile = abiGavInput
+
+            /* (vi) Configure jarexec's 'watchOutDir' property with an output directory 
+             * to make the task build-cacheable. */
+
+            watchOutDir = file("L:/ingocoder/classes/")
+        }
+
+        ...
+
 
 ## What You Get
 
-The ABI inspection results in output that looks like this:
-    
-    Project class com.lingocoder.poc.HttpClientWrapper has an ABI dependency on...
-        |___ httpclient
-    
-    Project class com.lingocoder.poc.Track has an ABI dependency on...
-        |___ jackson-annotations
-    
-    Project class com.lingocoder.poc.Frankenstein has an ABI dependency on...
-        |___ commons-math
-        |___ de.huxhorn.sulky.generics
-        |___ bitcoinj-core-0.15
-        |___ janerics
-    
-    Project class com.lingocoder.poc.ProjectClass$1 has an ABI dependency on...
-        |___ lingocoder.core
+Running the above JarExec task as *`:execjar`* will get you this report to stdout:
 
-## Helpful Tips
+        ...
+        > Task :execjar
+        Build cache key for task ':execjar' is 704557cc19a9ef9e6f6acbff333c4387
+        Task ':execjar' is not up-to-date because:
+          Input property 'watchInFile' file L:\ingocoder\input\files\abi.gav.coordinates.1.txt has been added.
+        
+        >--: Project class com.lingocoder.poc.HttpClientWrapper has an ABI dependency on...
+        |____\--- httpclient
+        
+        >--: Project class com.lingocoder.poc.Frankenstein has an ABI dependency on...
+        |    +--- commons-math
+        |    +--- de.huxhorn.sulky.generics
+        |    +--- bitcoinj-core-0.15
+        |____\--- janerics
+        
+        >--: Project class com.lingocoder.poc.Track has an ABI dependency on...
+        |____\--- jackson-annotations
+        
+        >--: Project class com.lingocoder.poc.ProjectClass$1 has an ABI dependency on...
+        |____\--- lingocoder.core
+        
+        ...
 
-For smaller projects, it would be easy to assemble the required input by hand. But for larger projects, you could also leverage a dependency management tool like Ant, Maven or Gradle to automate the preparation of the input. They all provide some way to dump a class path. First, you would need to define your library's dependencies in the respective tool's build script. Here's a Gradle script example of dependencies defined for some library:
+        BUILD SUCCESSFUL in...
+
+## ABI Command Options
+
+Though it might be more convenient to run through a script, the ABI Inspector was designed to also work as a standalone Java application. It provides the following command line interface:
+
+        usage:
+
+        java -cp {your_project_classpath} com.lingocoder.abi.app.AbiApp -a
+               <artifacts-gav-file> | -g <gav-coordinates> -c <classes-dir> [-d
+               <dependencies-file>]  [-help] -p <package-to-scan>
+         -a <artifacts-gav-file>   In place of the <gav-coordinates> option, you
+                                   could alternatively provide a new
+                                   line-separated file containing Maven-style
+                                   G:A:V dependency coordinates {e.g.
+                                   com.lingocoder:abinspector:0.4}
+         -c <classes-dir>          The parent directory that contains the classes
+                                   of the specified package {e.g. 'build/classes'}
+         -d <dependencies-file>    To improve the processing speed of ABI
+                                   inspection, provide file a list of your
+                                   project's dependencies in a new line-separated
+                                   file containing the absolute file system paths
+                                   to a project's dependencies {e.g.
+                                   /home/james/.m2/repository/org/example/my-api/1
+                                   0.18/my-api-10.18.jar}
+         -g <gav-coordinates>      A space-delimited sequence of Maven-style G:A:V
+                                   dependency coordinates {e.g.
+                                   org.example:my-api:10.18[,eg.foo.wow:anartifact
+                                   id:v8][,...]}
+         -help                     Print this message
+         -p <package-to-scan>      A space-delimited sequence of packages in which
+                                   project classes are contained {e.g.
+                                   com.example.mypackage net.foo.another.pkg ...}
+                                   
+Those options correspond to the properties used in [*the above JarExec plugin usage example*](#run-abi-using-the-jarexec-gradle-plugin).
+
+To scan your library's API from the command line, the same input provided to the plugin must be provided to the CLI:
+
+    java -cp <your_library's_class_path...> com.lingocoder.abi.app.AbiApp -c <classes-dir>  -p <packages-to-scan> -a <artifacts-gav-file> -d <dependencies-file>
+
+1. The runtime dependencies required by your library. These must be included in this tool's classpath (*`-cp <your_library's_class_path...>`*). Of course, the [*`com.lingocoder:abi.cli:n.n.n`*](http://bit.ly/abiCLImvn) artifact itself must also be in the classpath
+2. The absolute path of the root directory of your library's classes (*`-c <classes-dir>`*). For example: `target/classes`
+3. A list of packages of which your library's classes are members (*`-p <packages-to-scan>`*) For example: `com.example.my.api`
+4. The absolute path to a file that contains a list of Maven-style *`G:A:V`* module identifiers of your library's dependencies (*`-a <artifacts-gav-file>`*)
+5. The absolute path to a file that contains a list of absolute paths to your library's dependencies (*`-d <dependencies-file>`*)
+
+The output when ran through the CLI is the same as that shown for [*the plugin example above*](#run-abi-using-the-jarexec-gradle-plugin).
+
+## Helpful Tips On Providing The Required Input
+
+The ABI Inspector needs you to input [*specific information about your library's dependencies*](#abi-command-options). For smaller projects, it would be easy to assemble the required input by hand. But for larger projects, you could also leverage a dependency management tool like Ant, Maven or Gradle to automate the preparation of the input. They all provide some way to dump a class path. First, you would need to define your library's dependencies in the respective tool's build script. Here's a Gradle script example of dependencies defined for some library:
 
     ...
     dependencies {
@@ -153,4 +267,4 @@ Create a file named, „*logback.xml*“. Paste the following configuration into
 
 ## Watch This Space
 
-A Gradle plugin with additional capabilities is in the works. Any and all questions or suggestions are welcomed. [*Please get in touch*](mail:to=coder@lingcoder.com).
+A Gradle plugin with additional capabilities is in the works. You are welcomed to [*PM me through the Gradle Forums*](http://bit.ly/LogIn2MsgMe) with any and all questions or suggestions.

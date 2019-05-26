@@ -59,9 +59,9 @@ public class CmdLineInterface {
         OptionGroup gavOptGrp = new OptionGroup( );
 
         options.addOption( "help", "Print this message" );
-        Option pkg = Option.builder( "p" ).argName( "package-to-scan" )
+        Option pkg = Option.builder( "p" ).argName( "packages-to-scan" )
                 .hasArgs( )
-                .desc( "The specific base package in which project classes are contained {e.g. com.example.mypackage}" )
+                .desc( "A space-delimited sequence of packages in which project classes are contained {e.g. com.example.mypackage net.foo.another.pkg ...}" )
                 .required( ).build( );
 
         Option classes = Option.builder( "c" ).argName( "classes-dir" )
@@ -71,7 +71,7 @@ public class CmdLineInterface {
 
         Option gav = Option.builder( "g" ).argName( "gav-coordinates" )
                 .hasArgs( )
-                .desc( "A space-separated sequence of Maven-style G:A:V dependency coordinates {e.g. org.example:my-api:10.18[,eg.foo.wow:anartifactid:v8][,...]}" )
+                .desc( "A space-delimited sequence of Maven-style G:A:V dependency coordinates {e.g. org.example:my-api:10.18[,eg.foo.wow:anartifactid:v8][,...]}" )
                 ./* required(). optionalArg( true ).*/build( );
 
         Option gavFile = Option.builder( "a" ).argName( "artifacts-gav-file" )
