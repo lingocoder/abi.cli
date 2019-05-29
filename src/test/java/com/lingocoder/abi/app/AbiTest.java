@@ -30,7 +30,7 @@ import org.junit.Test;
 
 public class AbiTest extends BaseAbiTest {
 
-	private Abi classUnderTest = new Abi( );
+	private Abi classUnderTest;
 
 	public AbiTest( ) {
 		super( );
@@ -38,6 +38,12 @@ public class AbiTest extends BaseAbiTest {
 
 	@Before
 	public void setUp( ) {
+
+		Configuration conf = new Configuration( this.projectClassesRoot,
+				this.definedDependencies,
+				new String[ ] { this.projectClassesSpecificPackage } );
+
+		this.classUnderTest = new Abi( conf );		
 
 		this.dependency4 = this.artifact4Path.toFile( );
 	}
@@ -47,7 +53,7 @@ public class AbiTest extends BaseAbiTest {
 			throws IOException {
 
 		Map<Class<?>, Set<String>> actualDependenciesMap = classUnderTest
-				.inspect( this.args );
+				.inspect( /* this.args  */ );
 
 		print( actualDependenciesMap );
 

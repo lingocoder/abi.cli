@@ -20,53 +20,50 @@ package com.lingocoder.abi.app;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Set;
-import java.util.stream.Collectors;
+import com.lingocoder.classic.ClassPathFilter;
 
 public class Configuration {
 
-	private Path classesDir;
+	public static final Path DEFAULT_CLASSES_DIR = Paths.get(
+			System.getProperty( "user.dir" ), "build", "classes", "java",
+			"main" );
+			
+	private final Path classesDir;
 
-	private String packageToScan;
+	private final Set<String> gavs;
 
-	/**
-	 * 
-	 * @param args
-	 *                 <ul>
-	 *                 <li>Element <code>0</code> must be
-	 *                 <em><code>projectClassesRoot</code></em>.</li>
-	 *                 <li>Element <code>1</code> must be
-	 *                 <em><code>a specific package</code></em>.</li>
-	 *                 <li>Elements <code>2-args.length</code> must be
-	 *                 <em><code>G:A:V</code>-style</em> dependency
-	 *                 coordinates.</li>
-	 *                 </ul>
-	 * @return A {@link Set} of <em><code>G:A:V</code>-style</em> dependency
-	 *         coordinates.
-	 */
-	protected Set<String> configure( String... args ) {
-		this.classesDir = Paths.get( args[ 0 ] );
-		this.packageToScan = args[ 1 ];
-		Set<String> dpendnCoordinates = Arrays
-				.asList( Arrays.copyOfRange( args, 2, args.length ) ).stream( )
-				.parallel( ).collect( Collectors.toSet( ) );
-		return dpendnCoordinates;
-	}
+	private final Set<String> dependencies;
 
-	protected String getPackageToScan( ) {
-		return this.packageToScan;
+	private final String[ ] packagesToScan;
+
+	private final ClassPathFilter cpFilter = new ClassPathFilter( );
+
+	public Configuration( Path classesDir, Set<String> gavs,
+			String[ ] packagesToScan ) {
+		
+		this.classesDir = classesDir;
+
+		this.gavs = gavs;
+
+		this.packagesToScan = packagesToScan;
+		
+		this.dependencies = this.cpFilter.filterClassPath( gavs );		
 	}
 
 	protected Path getClassesDir( ) {
 		return this.classesDir;
 	}
 
-	protected void setClassesDir( Path classesDir ) {
-		this.classesDir = classesDir;
+	public Set<String> getGavs( ) {
+		return gavs;
 	}
 
-	protected void setPackageToScan( String packageToScan ) {
-		this.packageToScan = packageToScan;
+	public String[ ] getPackagesToScan( ) {
+		return packagesToScan;
+	}
+
+	public Set<String> getDependencies( ) {
+		return dependencies;
 	}
 }

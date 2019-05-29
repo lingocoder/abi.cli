@@ -19,6 +19,7 @@
 package com.lingocoder.abi.app;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Set;
 
@@ -40,14 +41,14 @@ public class ConfigurationTest extends BaseAbiTest {
 
 	@Before
 	public void setUp( ) {
-		this.classUnderTest = new Configuration( );
+		this.classUnderTest = new Configuration( this.projectClassesRoot,
+				this.definedDependencies, new String[ ] { this.projectClassesSpecificPackage } );
 	}
 
 	@Test
 	public void testConfigureMapsArrayToValidAppInput( ) {
 
-		Set<String> actualDepedencyList = this.classUnderTest
-				.configure( this.args );
+		Set<String> actualDepedencyList = this.classUnderTest.getGavs( );
 
 		assertEquals( this.definedDependencies.size( ),
 				actualDepedencyList.size( ) );
@@ -58,6 +59,6 @@ public class ConfigurationTest extends BaseAbiTest {
 				this.classUnderTest.getClassesDir( ) );
 
 		assertEquals( this.projectClassesSpecificPackage,
-				this.classUnderTest.getPackageToScan( ) );
+				this.classUnderTest.getPackagesToScan( )[ 0 ] );
 	}
 }

@@ -31,11 +31,9 @@ import com.lingocoder.classic.Classifier;
 import com.lingocoder.file.Lookup;
 import com.lingocoder.jar.JarFiler;
 
-public class Abi {
+import static com.lingocoder.abi.app.Configuration.*;
 
-	private static final Path DEFAULT_CLASSES_DIR = Paths.get(
-			System.getProperty( "user.dir" ), "build", "classes", "java",
-			"main" );
+public class Abi {
 
 	private final GroupingAbiInspector<Class<?>, JarFile> abi;
 
@@ -43,12 +41,30 @@ public class Abi {
 
 	private String packageToScan;
 
+	private String[] packagesToScan;
+
 
 	private final Classifier classifier;
 
 	private final Lookup<String> finder;
 
-	private final static Configuration conf = new Configuration( );
+	private final /* static */ Configuration conf;
+
+	public Abi( Configuration conf ) {
+
+		this.conf = conf;
+	
+		this.abi = new JarGroupingAbiInspector<>( );
+
+		this.classesDir = DEFAULT_CLASSES_DIR;
+		
+		this.classifier = new Classifier( );
+
+		this.packagesToScan = conf.getPackagesToScan( );
+		
+		this.finder = new Lookup<>( this.conf.getDependencies( ) );
+
+	}
  
 	public Abi( Set<String> dependencies ) {
 
@@ -62,13 +78,13 @@ public class Abi {
 
 		this.finder = new Lookup<>( dependencies );
 
-		
+		this.conf = new Configuration(classesDir, null, new String[]{this.packageToScan} );
 	}
-
+/* 
 	public Abi( ) {
-		this( null );
+		this( new Configuration( ) );
 	}
-
+ */
 	protected Path getClassesDir( ) {
 		return classesDir;
 	}
@@ -84,7 +100,7 @@ public class Abi {
 	protected void setPackageToScan( String packageToScan ) {
 		this.packageToScan = packageToScan;
 	}
-
+/* 
 	protected Map<Class<?>, Set<String>> inspect( String... args ) {
 
 		Set<JarFile> dependencies = this.finder
@@ -101,4 +117,21 @@ public class Abi {
 
 		return this.abi.inspect( projectClasses, dependencies );
 	}
+ */
+	protected Map<Class<?>, Set<String>> inspect(  ) {
+
+		Set<JarFile> dependencies = this.finder
+				.findInCache( conf.getGavs( ) ).stream( )
+				.map( path -> path.toFile( ) ).map( JarFiler::toJarFile )
+				.filter( jar -> jar != null ).collect( Collectors.toSet( ) );
+
+		this.classesDir = conf.getClassesDir( );
+
+		this.packagesToScan = conf.getPackagesToScan( );
+
+		Set<Class<?>> projectClasses = this.classifier
+				.classify( this.classesDir, this.packagesToScan );
+
+		return this.abi.inspect( projectClasses, dependencies );
+	}	
 }

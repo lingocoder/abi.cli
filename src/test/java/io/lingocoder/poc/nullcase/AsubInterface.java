@@ -16,35 +16,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.lingocoder.abi.app;
+package io.lingocoder.poc.nullcase;
 
-import static com.lingocoder.abi.io.AbiIo.print;
-/* import static com.lingocoder.abi.io.CmdLineInterface.dependenciesFile; */
-import static com.lingocoder.abi.io.CmdLineInterface.parseArgs;
+import org.apache.commons.codec.Decoder;
 
-import java.util.Map;
-import java.util.Set;
+import org.apache.http.client.methods.Configurable;
 
-public class AbiApp {
+import org.bitcoinj.core.Coin;
 
-	static public void main( String... args ) {
+public interface AsubInterface extends Configurable {
 
-		Abi app = null;
-
-		Configuration conf = parseArgs( args );
-/* 		String[ ] parsedArgs = parseArgs( args ); */
-/* 
-		if ( dependenciesFile( ).isPresent( ) ) {
- */
-			app = new Abi( /* dependenciesFile( ).get( ) */ conf );
-/* 			
-		} else {
-			
-			app = new Abi( );
-		}
- */
-		Map<Class<?>, Set<String>> groupedAbi = app.inspect( /* parsedArgs */ );
-
-		print( groupedAbi );
-	}
+    Decoder m( Coin btc );
 }
