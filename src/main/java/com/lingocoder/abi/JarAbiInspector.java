@@ -19,7 +19,7 @@
 package com.lingocoder.abi;
 
 import static com.lingocoder.file.Loader.loadIgnore;
-
+import static com.lingocoder.file.Loader.toBinaryName;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -30,28 +30,34 @@ import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import com.lingocoder.file.Loader;
 import com.lingocoder.reflection.ComposedTypesChecker;
 import com.lingocoder.reflection.TypesChecker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JarAbiInspector implements AbiInspector<Set<String>, JarFile> {
+
+	private static final Logger LOG = LoggerFactory.getLogger( "JarAbiInspector" );
 
 	private TypesChecker<Set<String>, Class<?>> checker = new ComposedTypesChecker<>( );
 
 	private static final Set<String> ignore = loadIgnore( );
 
-	private Map<String, Set<String>> dependencyCache = new ConcurrentHashMap<>( );
+	private static final Map<String, Set<String>> dependencyCache = new ConcurrentHashMap<>( );
 
-	private Map<Class<?>, Set<String>> projClassCache = new ConcurrentHashMap<>( );
+	private static final Map<Class<?>, Set<String>> projClassCache = new ConcurrentHashMap<>( );
 
 	@Override
 	public Set<String> inspect( Class<?> aProjectClass, JarFile aDependency ) {
 
 		Set<String> depTypes = memoize( aDependency.getName( ),
-				this.dependencyCache,
+				/* this. */dependencyCache,
 				( aJar ) -> this.checkDependency( aDependency ) );
 		
-		Set<String> projTypes = memoize( aProjectClass, this.projClassCache,
-				( aClass ) -> this.checker.check( aProjectClass ) );
+		Set<String> projTypes = memoize( aProjectClass, /* this. */projClassCache,
+				( aClass ) -> this.checkProjectClass( aProjectClass ) );
 		
 		depTypes.retainAll( projTypes );
 
@@ -75,8 +81,8 @@ public class JarAbiInspector implements AbiInspector<Set<String>, JarFile> {
 				if ( name.endsWith( ".class" ) && !name.startsWith( "META-INF" )
 						&& !name.contains( "$" ) && !ignore.contains( name ) ) {
 
-					jarClasses.add(
-							name.replace( "/", "." ).replace( ".class", "" ) );
+					jarClasses.add( toBinaryName( name )
+/* 							name.replace( "/", "." ).replace( ".class", "" ) */ );
 				}
 			}
 		}
@@ -95,6 +101,26 @@ public class JarAbiInspector implements AbiInspector<Set<String>, JarFile> {
 		} else {
 			types = otherWise.apply( key );
 		}
+		return types;
+	}
+
+	private Set<String> checkProjectClass( Class<?> aProjectClass ) {
+
+		Set<String> types = Collections.emptySet( );
+
+		String className = Loader.toIgnoredName( aProjectClass.getName( ) );
+
+		if ( !ignore.contains( className ) ) {
+
+			LOG.debug( "Checking Project Class '{}'" , className );
+
+			types = this.checker.check( aProjectClass );
+		}
+		else {
+			
+			LOG.debug( "Ignoring Project Class '{}'", className );
+		}
+		
 		return types;
 	}
 }
