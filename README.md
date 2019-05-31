@@ -1,6 +1,6 @@
 # Application Binary Interface (ABI) Inspector
 
-The ABI Inspector (*ABI*) is a command line application that scans the API of a Java library to detect whether the library exposes types from its dependencies to the library consumers' runtime classpath. That's known as „*dependency leakage*“.
+The ABI Inspector (*ABI*) is a command line application that scans the API of a Java library to detect whether the library exposes types from its dependencies to the library consumers' compile classpath. That's known as „*dependency leakage*“.
 
 ## Usage
 
@@ -17,21 +17,23 @@ General steps for using the JarExec plugin are [*here*](http://bit.ly/JarExecSte
 1. Add [*`'com.lingocoder:abi.cli:n.n.n'`*](http://bit.ly/abiCLImvn) as a dependency in your build script
 2. Set the options that ABI requires as the value of the *`args`* property of the JarExec task
 3. Set *`com.lingocoder.abi.app.AbiApp`* as the value of the *`mainClass`* property of the JarExec task
-4. Set the value of the *`classPath`* property of the JarExec task to the Gradle build configuration that contains the abi-cli dependency. The *`classPath`* property also needs to include any other runtime dependencies required by your library.
+4. Set the value of the *`classpath`* property of the JarExec task to the Gradle build configuration that contains the abi-cli dependency. The *`classpath`* property also needs to include any other runtime dependencies required by your library.
 
 
         plugins{
             id 'java-library'
-            id 'com.lingocoder.jarexec' version '0.4.8'
+            id 'com.lingocoder.jarexec' version '0.5.0'
         }
         ...
+        def abiClassesDir = file("L:/ingocoder/classes/")
+
         dependencies{
 
             ...
 
-            implementation group: 'com.lingocoder', name: 'abi.cli', version: '0.4.7'
+            implementation group: 'com.lingocoder', name: 'abi.cli', version: '0.5.0'
  
-            implementation files("L:\\ingocoder\\classes\\")
+            implementation files(abiClassesDir.absolutePath)
             ...
         }
         ...    
@@ -43,7 +45,7 @@ General steps for using the JarExec plugin are [*here*](http://bit.ly/JarExecSte
 
             args = [
                 "-a", abiGavInput.absolutePath,
-                "-c", "L:\\ingocoder\\classes\\", 
+                "-c", abiClassesDir.absolutePath, 
                 "-p", "com.lingocoder.poc", "net", "org.springframework"]
 
             /* (ii) The class path the main class needs. This is configurable by adding what your main
@@ -51,11 +53,11 @@ General steps for using the JarExec plugin are [*here*](http://bit.ly/JarExecSte
 
             classpath = configurations.default
 
-            /* (iii) Configure jarexec's 'jar' property with your executable jar. */
+            /* (iii) Configure jarexec's 'jar' property with the abi.cli jar. */
 
-            jar = jarhelper.fetch('com.lingocoder:abi.cli:0.4.8').orElse('build/libs/abi.cli-0.4.8.jar')
+            jar = jarhelper.fetch('com.lingocoder:abi.cli:0.5.0').orElse('build/libs/abi.cli-0.0.0.jar')
 
-            /* (iv) Configure jarexec's 'watchInFile' property with your input file. */
+            /* (iv) Configure jarexec's mainClass property as the abi.cli application. */
 
             mainClass = 'com.lingocoder.abi.app.AbiApp'
 
@@ -67,7 +69,7 @@ General steps for using the JarExec plugin are [*here*](http://bit.ly/JarExecSte
             /* (vi) Configure jarexec's 'watchOutDir' property with an output directory 
              * to make the task build-cacheable. */
 
-            watchOutDir = file("L:/ingocoder/classes/")
+            watchOutDir = abiClassesDir
         }
 
         ...
