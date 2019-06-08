@@ -42,7 +42,7 @@ public class ConfigurationTest extends BaseAbiTest {
 	@Before
 	public void setUp( ) {
 		this.classUnderTest = new Configuration( this.projectClassesRoot,
-				this.definedDependencies, new String[ ] { this.projectClassesSpecificPackage } );
+				this.definedDependencies, new String[ ] { this.projectClassesSpecificPackage }, false );
 	}
 
 	@Test

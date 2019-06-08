@@ -20,15 +20,15 @@ package com.lingocoder.abi;
 
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarFile;
 
 import com.lingocoder.file.GavTokenHelper;
 
-public class JarGroupingAbiInspector<T, U>
-		implements GroupingAbiInspector<Class<?>, JarFile> {
+public class JarGroupingAbiInspector<T, U, V>
+		implements GroupingAbiInspector<Class<?>, JarFile, Set<String>> {
 
 	private AbiInspector<Set<String>, JarFile> jarAbiInspector = new JarAbiInspector( );
 
@@ -70,13 +70,11 @@ public class JarGroupingAbiInspector<T, U>
 
 		if ( !types.isEmpty( ) ) {
 			if ( groupedAbi.get( aProjectClass ) == null )
-				groupedAbi.put( aProjectClass, new HashSet<String>( ) );
+				groupedAbi.put( aProjectClass, new ConcurrentSkipListSet<String>( ) );
 
 			String jarFilePath = aDependency.getName( );
 
-			gav.toArtifactToken( Paths.get( jarFilePath ) )
-					.ifPresent( artifact -> groupedAbi.get( aProjectClass )
-							.add( artifact ) );
+			groupedAbi.get( aProjectClass ).add( gav.toGAV( Paths.get( jarFilePath ) ) ) ;
 		}
 	}
 }

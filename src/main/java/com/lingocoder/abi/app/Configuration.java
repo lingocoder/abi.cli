@@ -39,8 +39,10 @@ public class Configuration {
 
 	private final ClassPathFilter cpFilter = new ClassPathFilter( );
 
+	private final boolean verbose;
+
 	public Configuration( Path classesDir, Set<String> gavs,
-			String[ ] packagesToScan ) {
+			String[ ] packagesToScan, boolean verbose ) {
 		
 		this.classesDir = classesDir;
 
@@ -48,7 +50,9 @@ public class Configuration {
 
 		this.packagesToScan = packagesToScan;
 		
-		this.dependencies = this.cpFilter.filterClassPath( gavs );		
+		this.dependencies = this.cpFilter.filterClassPath( gavs );
+		
+		this.verbose = verbose;
 	}
 
 	protected Path getClassesDir( ) {
@@ -65,5 +69,9 @@ public class Configuration {
 
 	public Set<String> getDependencies( ) {
 		return dependencies;
+	}
+
+	public boolean isVerbose( ) {
+		return verbose;
 	}
 }

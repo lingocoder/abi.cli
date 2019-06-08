@@ -16,14 +16,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.lingocoder.abi;
+package com.lingocoder.reflection;
 
-import java.util.Map;
-import java.util.Set;
+public interface ReportingTypesChecker<T, U, V> extends TypesChecker<T, U> {
 
-public interface GroupingAbiInspector<T, U, V>
-		extends AbiInspector<Map<T, /* Set<String> */V>, U> {
 
-	Map<T, /* Set<String> */V> inspect( Set<T> projectClasses, Set<U> dependencies );
-
+    T check( U u, V v );
 }

@@ -69,6 +69,11 @@ public class CLIHelper {
                 .desc( "To improve the processing speed of ABI inspection, provide file a list of your project's dependencies in a new line-separated file containing the absolute file system paths to a project's dependencies {e.g. /home/james/.m2/repository/org/example/my-api/10.18/my-api-10.18.jar}" )
                 .build( );
  */
+        Option verbose = Option.builder( "v" )
+                .argName( "verbose" ).hasArg( false )
+                .desc( "Show the names of classes, supertypes, constructors, methods, parameters, return types and annotations that are exposed in the analyzed API" )
+                .build( );
+
         gavOptGrp.addOption( gavs );
 
         gavOptGrp.addOption( gavsFile );
@@ -81,6 +86,8 @@ public class CLIHelper {
 /*         options.addOption( dependenciesFile ); */
         options.addOptionGroup( gavOptGrp )/* .addOption( gav ) */;
 
+        options.addOption( verbose );
+        
         CommandLineParser parser = new DefaultParser( );
 
         try {

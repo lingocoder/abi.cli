@@ -40,21 +40,36 @@ public class BaseAbiInspectorTest extends BaseAbiCheckerTest {
 
 	protected File dependency7;
 
-	protected Set<?> allDependencies = Set.of( "httpclient", "unit",
-			"jackson-annotations", "commons-lang3", "jarexec.plugin",
-			"bitcoinj-core-0.15", "commons-math", "janerics",
-			"de.huxhorn.sulky.generics" );
+	protected Set<?> allDependencies = Set.of( "org.apache.httpcomponents:httpclient:4.5.3", "junit:junit:4.12",
+			"com.fasterxml.jackson.core:jackson-annotations:2.9.8", "org.apache.commons:commons-lang3:3.5", "com.lingocoder:jarexec.plugin:0.3",
+			"org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT", "org.apache.commons:commons-math:2.2", "jp.dodododo.janerics:janerics:1.0.1",
+			"de.huxhorn.sulky:de.huxhorn.sulky.generics:8.2.0" );
 
-	protected Set<?> expectedDependenciesForClass1 = Set.of( "httpclient" );
+	protected Set<?> expectedDependenciesForClass1 = Set.of( "org.apache.httpcomponents:httpclient:4.5.3" );
 
-	protected Set<?> expectedDependenciesForClass2 = Set.of( "jarexec.plugin" );
+	protected Set<?> expectedDependenciesForClass2 = Set.of( "com.lingocoder:jarexec.plugin:0.3" );
 
 	protected Set<?> expectedDependenciesForClass3 = Set
-			.of( "jackson-annotations" );
+			.of( "com.fasterxml.jackson.core:jackson-annotations:2.9.8" );
 
 	protected Set<?> expectedDependenciesForClass4 = Set.of(
-			"bitcoinj-core-0.15", "commons-math", "janerics",
-			"de.huxhorn.sulky.generics" );
+			"org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT", "org.apache.commons:commons-math:2.2", "jp.dodododo.janerics:janerics:1.0.1",
+			"de.huxhorn.sulky:de.huxhorn.sulky.generics:8.2.0" );
+
+	protected Set<?> altDependencies = Set.of( "httpclient", "unit",
+	"jackson-annotations", "commons-lang3", "jarexec.plugin",
+	"bitcoinj-core-0.15", "commons-math", "janerics",
+	"de.huxhorn.sulky.generics" );
+	
+	protected Set<?> altDependenciesForClass1 = Set.of( "httpclient" );
+	
+	protected Set<?> altDependenciesForClass2 = Set.of( "jarexec.plugin" );
+	
+	protected Set<?> altDependenciesForClass3 = Set
+	.of( "jackson-annotations" );
+	
+	protected Set<?> altDependenciesForClass4 = Set.of(
+	"bitcoinj-core-0.15", "commons-math", "janerics", "de.huxhorn.sulky.generics" );			
 
 	protected void assertDependenciesGrouping( Set<?> expected,
 			Set<?> actual ) {
@@ -65,5 +80,16 @@ public class BaseAbiInspectorTest extends BaseAbiCheckerTest {
 
 		assertFalse( actual.containsAll( allDependencies ) );
 
+	}	
+	protected void assertExpectedGAVs( Set<?> expected,Set<?> alternative,
+			Set<?> actual ) {
+
+		assertTrue( actual.equals( expected ) || actual.equals(alternative) );
+
+		assertTrue( expected.containsAll( actual ) || alternative.containsAll( actual ) );
+
+		assertFalse( actual.containsAll( expected ) );
+
+		assertFalse( actual.containsAll( alternative ) );
 	}
 }

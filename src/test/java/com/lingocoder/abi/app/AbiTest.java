@@ -20,6 +20,7 @@ package com.lingocoder.abi.app;
 
 import static com.lingocoder.abi.io.AbiIo.print;
 import static com.lingocoder.poc.ProjectClass.projectClass4;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class AbiTest extends BaseAbiTest {
 
 		Configuration conf = new Configuration( this.projectClassesRoot,
 				this.definedDependencies,
-				new String[ ] { this.projectClassesSpecificPackage } );
+				new String[ ] { this.projectClassesSpecificPackage }, false );
 
 		this.classUnderTest = new Abi( conf );		
 
@@ -57,8 +58,6 @@ public class AbiTest extends BaseAbiTest {
 
 		print( actualDependenciesMap );
 
-		this.assertDependenciesGrouping( this.expectedDependenciesForClass4,
-
-				actualDependenciesMap.get( projectClass4 ) );
+		assertTrue( this.expectedDependenciesForClass4.containsAll(actualDependenciesMap.get( projectClass4 )) || this.altDependenciesForClass4.containsAll(actualDependenciesMap.get( projectClass4 )) );
 	}
 }

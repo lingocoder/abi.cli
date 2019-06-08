@@ -37,7 +37,7 @@ import com.lingocoder.reflection.test.BaseAbiInspectorTest;
 
 public class JarGroupingAbiInspectorTest extends BaseAbiInspectorTest {
 
-	private GroupingAbiInspector<Class<?>, JarFile> classUnderTest;
+	private GroupingAbiInspector<Class<?>, JarFile, Set<String>> classUnderTest;
 
 	public JarGroupingAbiInspectorTest( ) {
 		super( );
@@ -71,8 +71,10 @@ public class JarGroupingAbiInspectorTest extends BaseAbiInspectorTest {
 		Map<Class<?>, Set<String>> actualDependenciesMap = classUnderTest
 				.inspect( projectClass3, new JarFile( this.dependency3 ) );
 
-		this.assertDependenciesGrouping( this.expectedDependenciesForClass3,
-				actualDependenciesMap.get( projectClass3 ) );
+		print( actualDependenciesMap );
+
+		assertTrue( this.expectedDependenciesForClass3.containsAll(actualDependenciesMap.get( projectClass3 )) || this.altDependenciesForClass3.containsAll(actualDependenciesMap.get( projectClass3 )) );
+		
 	}
 
 	@Test
@@ -94,13 +96,12 @@ public class JarGroupingAbiInspectorTest extends BaseAbiInspectorTest {
 						Set.of( new JarFile( this.dependency1 ),
 								new JarFile( this.dependency2 ) ) );
 
-		this.assertDependenciesGrouping( this.expectedDependenciesForClass1,
-				actualDependenciesMap.get( projectClass1 ) );
-
-		this.assertDependenciesGrouping( this.expectedDependenciesForClass2,
-				actualDependenciesMap.get( projectClass2 ) );
-
 		print( actualDependenciesMap );
+
+		assertTrue( this.expectedDependenciesForClass1.containsAll(actualDependenciesMap.get( projectClass1 )) || this.altDependenciesForClass1.containsAll(actualDependenciesMap.get( projectClass1 )) );
+						
+		assertTrue( this.expectedDependenciesForClass2.containsAll(actualDependenciesMap.get( projectClass2 )) || this.altDependenciesForClass2.containsAll(actualDependenciesMap.get( projectClass2 )) );
+						
 	}
 
 	@Test
@@ -118,16 +119,14 @@ public class JarGroupingAbiInspectorTest extends BaseAbiInspectorTest {
 								new JarFile( this.dependency2 ),
 								new JarFile( this.dependency3 ) ) );
 
-		this.assertDependenciesGrouping( this.expectedDependenciesForClass1,
-				actualDependenciesMap.get( projectClass1 ) );
-
-		this.assertDependenciesGrouping( this.expectedDependenciesForClass2,
-				actualDependenciesMap.get( projectClass2 ) );
-
-		this.assertDependenciesGrouping( this.expectedDependenciesForClass3,
-				actualDependenciesMap.get( projectClass3 ) );
-
 		print( actualDependenciesMap );
+
+		assertTrue( this.expectedDependenciesForClass1.containsAll(actualDependenciesMap.get( projectClass1 )) || this.altDependenciesForClass1.containsAll(actualDependenciesMap.get( projectClass1 )) );
+
+		assertTrue( this.expectedDependenciesForClass2.containsAll(actualDependenciesMap.get( projectClass2 )) || this.altDependenciesForClass2.containsAll(actualDependenciesMap.get( projectClass2 )) );
+
+		assertTrue( this.expectedDependenciesForClass3.containsAll(actualDependenciesMap.get( projectClass3 )) || this.altDependenciesForClass3.containsAll(actualDependenciesMap.get( projectClass3 )) );
+
 	}
 
 	@Test
@@ -142,7 +141,7 @@ public class JarGroupingAbiInspectorTest extends BaseAbiInspectorTest {
 								new JarFile( this.dependency7 ) ) );
 
 		print( actualDependenciesMap );
-		this.assertDependenciesGrouping( this.expectedDependenciesForClass4,
-				actualDependenciesMap.get( projectClass4 ) );
+
+		assertTrue( this.expectedDependenciesForClass4.containsAll(actualDependenciesMap.get( projectClass4 )) || this.altDependenciesForClass4.containsAll(actualDependenciesMap.get( projectClass4 )) );
 	}
 }

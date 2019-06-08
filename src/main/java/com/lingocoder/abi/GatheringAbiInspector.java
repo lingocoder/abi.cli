@@ -18,12 +18,11 @@
  */
 package com.lingocoder.abi;
 
-import java.util.Map;
 import java.util.Set;
 
-public interface GroupingAbiInspector<T, U, V>
-		extends AbiInspector<Map<T, /* Set<String> */V>, U> {
+public interface GatheringAbiInspector<T, U, V>
+		extends AbiInspector<Set<T>, V> {
 
-	Map<T, /* Set<String> */V> inspect( Set<T> projectClasses, Set<U> dependencies );
+	Set<T> inspect( Set<U> projectClasses, Set<V> dependencies );
 
 }

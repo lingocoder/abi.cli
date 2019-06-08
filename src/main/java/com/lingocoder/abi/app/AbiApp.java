@@ -25,26 +25,27 @@ import static com.lingocoder.abi.io.CmdLineInterface.parseArgs;
 import java.util.Map;
 import java.util.Set;
 
+import com.lingocoder.abi.Reporting;
+
 public class AbiApp {
 
 	static public void main( String... args ) {
 
-		Abi app = null;
-
 		Configuration conf = parseArgs( args );
-/* 		String[ ] parsedArgs = parseArgs( args ); */
-/* 
-		if ( dependenciesFile( ).isPresent( ) ) {
- */
-			app = new Abi( /* dependenciesFile( ).get( ) */ conf );
-/* 			
+
+		Abi app = new Abi( conf );
+
+		if ( conf.isVerbose( ) ) {
+
+			Set<Reporting> gatheredAbi = app.nspect( );
+		
+		    print( gatheredAbi );
+		
 		} else {
 			
-			app = new Abi( );
-		}
- */
-		Map<Class<?>, Set<String>> groupedAbi = app.inspect( /* parsedArgs */ );
+			Map<Class<?>, Set<String>> groupedAbi = app.inspect( );
 
-		print( groupedAbi );
+			print( groupedAbi );
+		}
 	}
 }

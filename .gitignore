@@ -72,3 +72,4 @@ gradle/wrapper
 **/test-foo
 *.keep.*
 *.ser
+**/*ScratchPad*.*

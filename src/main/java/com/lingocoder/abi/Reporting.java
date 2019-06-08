@@ -18,12 +18,22 @@
  */
 package com.lingocoder.abi;
 
-import java.util.Map;
 import java.util.Set;
 
-public interface GroupingAbiInspector<T, U, V>
-		extends AbiInspector<Map<T, /* Set<String> */V>, U> {
+public interface Reporting extends Comparable<Reporting> {
 
-	Map<T, /* Set<String> */V> inspect( Set<T> projectClasses, Set<U> dependencies );
+	void print();
+
+	String getName();
+	
+	String getType();
+	
+	Set<Reporting> getLines( );
+	
+	Set<String> getGAVs( );
+	
+	int getIndent( );
+
+	void setIndent( int indent );
 
 }
