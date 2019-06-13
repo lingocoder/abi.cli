@@ -21,7 +21,6 @@ package com.lingocoder.abi.io;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,6 +51,6 @@ public class SetUtil {
     
     protected static Set<String> toSet( String[] strings ) {
 
-        return Arrays.asList( strings ).stream( ).collect( Collectors.toSet( ) );
+        return Set.of( strings ).parallelStream( ).collect( Collectors.toSet( ) );
     }
 }

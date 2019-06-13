@@ -2,7 +2,7 @@
 
 The ABI Inspector (*abi.cli*) is a console application that scans the API of a Java library to detect whether the library exposes types from its dependencies to the library consumer's compilation-time classpath. That's known as „*dependency leakage*“.
 
-The inspection will by default report a simple summary of what it calls the *ABI dependencies* it finds for each of your library's classes. Optionally (*given -v*), it will also report finer-grained details about your library's dependencies. Details like:
+The inspection will by default report a listing<sup>*1*</sup> of what it calls the *ABI dependencies* it finds for each of your library's classes. Optionally (*given -v*), it will also report finer-grained details about your library's dependencies. Details like:
 
  * The supertypes your library's classes extend
  * The types your library exposes through its public method and constructor signatures
@@ -25,7 +25,7 @@ General steps for using the JarExec plugin are [*here*](http://bit.ly/JarExecSte
 1. Add [*`'com.lingocoder:abi.cli:n.n.n'`*](http://bit.ly/abiCLImvn) as a dependency in your build script
 2. Set the options that abi.cli requires as the value of the *`args`* property of the JarExec task
 3. Set *`com.lingocoder.abi.app.AbiApp`* as the value of the *`mainClass`* property of the JarExec task
-4. Set the value of the *`classpath`* property of the JarExec task to the Gradle build configuration that contains the abi.cli dependency. The *`classpath`* property also needs to include any other runtime dependencies required by your library.<sup>*1*</sup>
+4. Set the value of the *`classpath`* property of the JarExec task to the Gradle build configuration that contains the abi.cli dependency. The *`classpath`* property also needs to include any other runtime dependencies required by your library.<sup>*2*</sup>
 
 
         plugins{
@@ -134,26 +134,31 @@ Originally, abi.cli was designed to work as a standalone console application. It
 
         java -cp {your_project_classpath} com.lingocoder.abi.app.AbiApp -a
                <artifacts-gav-file> | -g <gav-coordinates> -c <classes-dir> 
-               [-help] -p <package-to-scan>
+               [-help] -p <package-to-scan> -s
          -a <artifacts-gav-file>   In place of the <gav-coordinates> option, you
                                    could alternatively provide a new
                                    line-separated file containing Maven-style
                                    G:A:V dependency coordinates {e.g.
-                                   com.lingocoder:abinspector:0.4}
+                                   com.lingocoder:abinspector:0.4}.
          -c <classes-dir>          The parent directory that contains the classes
-                                   of the specified package {e.g. 'build/classes'}
+                                   of the specified package {e.g. 'build/classes'}.
          -g <gav-coordinates>      A space-delimited sequence of Maven-style G:A:V
                                    dependency coordinates {e.g.
                                    org.example:my-api:10.18[,eg.foo.wow:anartifact
-                                   id:v8][,...]}
-         -help                     Print this message
+                                   id:v8][,...]}.
+         -help                     Print this message.
          -p <packages-to-scan>     A space-delimited sequence of packages in which
                                    project classes are contained {e.g.
-                                   com.example.mypackage net.foo.another.pkg ...}
-         -v                        Show the names of classes, supertypes,
-                                   constructors, methods, parameters, return types
-                                   and annotations that are exposed in the
-                                   analyzed API                                   
+                                   com.example.mypackage net.foo.another.pkg ...}.
+         -s                        Show a summary with only the G:A:V coordinates of
+                                   dependencies. G:A:Vs are mapped to an aggregate
+                                   count of times a dependency is used. Usage can
+                                   be either as supertypes, constructors, methods,
+                                   parameters, return types or annotations that are
+                                   exposed in the analyzed API. Counts are approximate.
+         -v                        Show a verbose report. Includes the names of classes,
+                                   supertypes, constructors, methods, parameters, return
+                                   types and annotations that are exposed in the analyzed API.
                                    
 Those options correspond to the properties used in [*the above JarExec plugin usage example*](#run-abi-using-the-jarexec-gradle-plugin).
 
@@ -161,7 +166,7 @@ To scan your library's API from the command line, the same input provided in the
 
     java -cp <your_library's_class_path> com.lingocoder.abi.app.AbiApp -c <classes-dir>  -p <packages-to-scan> -a <artifacts-gav-file> -v
 
-1. The runtime dependencies required by your library.<sup>*1*</sup> These must be included in this tool's classpath (*`-cp <your_library's_class_path...>`*). Of course, the [*`com.lingocoder:abi.cli:n.n.n`*](http://bit.ly/abiCLImvn) artifact itself must also be in the classpath
+1. The runtime dependencies required by your library.<sup>*2*</sup> These must be included in this tool's classpath (*`-cp <your_library's_class_path...>`*). Of course, the [*`com.lingocoder:abi.cli:n.n.n`*](http://bit.ly/abiCLImvn) artifact itself must also be in the classpath
 2. The absolute path of the root directory of your library's classes (*`-c <classes-dir>`*). For example: `target/classes`
 3. A list of packages of which your library's classes are members (*`-p <packages-to-scan>`*) For example: `com.example.my.api org.acme edu`
 4. The absolute path to a file that contains a list of Maven-style *`G:A:V`* module identifiers of your library's dependencies (*`-a <artifacts-gav-file>`*)
@@ -170,7 +175,7 @@ The output when ran through the CLI is the same as that shown for [*the plugin e
 
 ## Helpful Tips On Providing The Required Input
 
-The ABI inspection process requires that you provide [*specific information about your library's dependencies*](#abi-command-options) as input to abi.cli.<sup>*1*</sup> For smaller projects, it would be easy to assemble the required input by hand. But for larger projects, you could also leverage a dependency management tool like Ant, Maven or Gradle to automate the preparation of the input. They all provide some way to dump info on your project's dependencies. First, you would need to define your library's dependencies in the respective tool's build script. Here's a Gradle script example of module identifiers defining the dependencies required by some library:
+The ABI inspection process requires that you provide [*specific information about your library's dependencies*](#abi-command-options) as input to abi.cli.<sup>*2*</sup> For smaller projects, it would be easy to assemble the required input by hand. But for larger projects, you could also leverage a dependency management tool like Ant, Maven or Gradle to automate the preparation of the input. They all provide some way to dump info on your project's dependencies. First, you would need to define your library's dependencies in the respective tool's build script. Here's a Gradle script example of module identifiers defining the dependencies required by some library:
 
     ...
     dependencies {
@@ -254,4 +259,7 @@ A Gradle plugin with additional capabilities is planned. You are welcomed to [*P
 
 \_____
 
-<sup><sup><sup>1</sup> *Your library's dependencies that were specified with a „`for compilation only`“ scope in the build script of your library, must also be included in abi.cli's runtime classpath*</sup></sup>
+<sup><sup><sup>*1*</sup> *A summary option (-s) will display a short table of G:A:Vs and approximate counts of the times the dependency's types are used in your library's public API.*</sup></sup>
+
+
+<sup><sup><sup>*2*</sup> *Your library's dependencies that were specified with a „`for compilation only`“ scope in the build script of your library, must also be included in abi.cli's runtime classpath*</sup></sup>

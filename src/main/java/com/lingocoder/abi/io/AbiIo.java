@@ -21,6 +21,7 @@ package com.lingocoder.abi.io;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.LongAdder;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -31,15 +32,21 @@ public class AbiIo {
 	private static final String next = "|    +--- ";
 
 	private static final String last = "|____" + "\\--- ";
-	
+
+	private static final String sumryLineBrk = "------------------------------------------------------------------------------";
+
 	/**
-	 * Displays the results of an ABI inspection in <em><code>stdout</code></em>.
+	 * Displays the results of an ABI inspection in
+	 * <em><code>stdout</code></em>.
 	 * 
-	 * @param abiMapping An association of ABI-scanned classes to their corresponding dependencies. 
+	 * @param abiMapping
+	 *                       An association of ABI-scanned classes to their
+	 *                       corresponding dependencies.
 	 */
 	public static void print( Map<Class<?>, Set<String>> abiMapping ) {
 
-		try ( PrintWriter prntWrtr = new PrintWriter( System.out, true, UTF_8 ) ) {
+		try (PrintWriter prntWrtr = new PrintWriter( System.out, true,
+				UTF_8 )) {
 
 			Set<Class<?>> keys = abiMapping.keySet( );
 
@@ -62,21 +69,43 @@ public class AbiIo {
 	}
 
 	/**
-	* Displays the results of an ABI inspection in <em><code>stdout</code></em>.
-	* 
-	* @param abiReports An association of ABI-scanned classes to their corresponding dependencies. 
-	*/
+	 * Displays the results of an ABI inspection in
+	 * <em><code>stdout</code></em>.
+	 * 
+	 * @param abiReports
+	 *                       An association of ABI-scanned classes to their
+	 *                       corresponding dependencies.
+	 */
 	public static void print( Set<Reporting> abiReports ) {
 
 		try (PrintWriter prntWrtr = new PrintWriter( System.out, true,
 				UTF_8 )) {
 			for ( Reporting report : abiReports ) {
 
-				prntWrtr.println( "\n\n" + ">--: "
-						+ "ABI dependencies found for...\n|" );
-
+				prntWrtr.println(
+						"\n\n" + ">--: " + "ABI dependencies found for...\n|" );
+				prntWrtr.flush( );
 				report.print( );
 			}
+		}
+	}
+
+	public static void summarize( Map<String, LongAdder> abiSummary ) {
+
+		try (PrintWriter prntWrtr = new PrintWriter( System.out, true,
+				UTF_8 )) {
+
+			prntWrtr.println( "\n\n" );
+			prntWrtr.println( sumryLineBrk );
+			prntWrtr.println(" ABI Dependencies Summary (counts are approximate)" );
+			prntWrtr.println( sumryLineBrk );
+/* 			abiSummary.parallelStream( )
+					.forEach(  map -> map.keySet( ).*/abiSummary.keySet().forEach( gav -> {
+						prntWrtr.print( " " + gav.strip() + ", seen " );
+						prntWrtr.print( abiSummary.get( gav ).sum( ) + " time(s)\n" );
+						prntWrtr.println(sumryLineBrk);
+		} /* ) */);
+		prntWrtr.flush( );
 		}
 	}
 }

@@ -53,7 +53,7 @@ public class ReportingAnnotationChecker<T, U, V> implements
 
 		Set<String> annotationTypes = annotationChecker.check( type );
 
-        annotationTypes.stream( ).filter( ann -> !in( ann, projPkgs ) ).filter( ann -> notJdk( ann ) ).forEach( ann -> {
+        annotationTypes.parallelStream( ).filter( ann -> !in( ann, projPkgs ) ).filter( ann -> notJdk( ann ) ).forEach( ann -> {
             
         types.add( ann );
             

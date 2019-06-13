@@ -23,6 +23,7 @@ import static com.lingocoder.file.Loader.toBinaryName;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +40,7 @@ import com.lingocoder.reflection.ReportingTypesChecker;
  *
  */
 public class ReportingJarAbiInspector<T extends Reporting>
-		implements AbiInspector<Reporting, Set<JarFile>> {
+		implements AbiInspector<Reporting, Set<JarFile>>, Summarizer {
 
 	private final Set<String> ignoreJdk = Set.of( "java.lang.", "sun.", "com.sun.", "javax.",
 			"java.", "jdk." );
@@ -51,6 +52,8 @@ public class ReportingJarAbiInspector<T extends Reporting>
 	private final GavTokenHelper gav = new GavTokenHelper( );
 
 	private ReportingTypesChecker<Set<String>, Class<?>, Set<Reporting>> projectChecker = new ReportingProjectChecker<>( );
+
+	private DependencySummarizer summarizer = new DependencySummarizer( );
 
 	@SuppressWarnings( "unchecked" )
 	@Override
@@ -70,8 +73,11 @@ public class ReportingJarAbiInspector<T extends Reporting>
 
 			if ( depTypes.retainAll( projTypes ) && !depTypes.isEmpty( ) ) {
 
-				allGAVs.add( gav.toGAV( Paths.get( aDependency.getName( ) ) ) );
+				String aGav = gav.toGAV( Paths.get( aDependency.getName( ) ) );
+				
+				allGAVs.add( aGav );
 
+				summarizer.enter( aGav, lines );
 			}
 		}
 
@@ -120,5 +126,10 @@ public class ReportingJarAbiInspector<T extends Reporting>
 			types = cache.get( aKey );
 		}
 		return types;
+	}
+
+	@Override
+	public Map<String, LongAdder> summarize( ) {
+		return summarizer.summarize();
 	}
 }

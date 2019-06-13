@@ -42,7 +42,7 @@ public class AbiTest extends BaseAbiTest {
 
 		Configuration conf = new Configuration( this.projectClassesRoot,
 				this.definedDependencies,
-				new String[ ] { this.projectClassesSpecificPackage }, false );
+				new String[ ] { this.projectClassesSpecificPackage }, false, false );
 
 		this.classUnderTest = new Abi( conf );		
 

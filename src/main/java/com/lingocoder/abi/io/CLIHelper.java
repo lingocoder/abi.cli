@@ -42,26 +42,26 @@ public class CLIHelper {
         
         CommandLine cmd = null;
 
-        options.addOption( "help", "Print this message" );
+        options.addOption( "help", "Print this message." );
 
         Option pkgs = Option.builder( "p" ).argName( "packages-to-scan" )
                 .hasArgs( )
-                .desc( "A space-delimited sequence of packages in which project classes are contained {e.g. com.example.mypackage net.foo.another.pkg ...}" )
+                .desc( "A space-delimited sequence of packages in which project classes are contained {e.g. com.example.mypackage net.foo.another.pkg ...}." )
                 .required( ).build( );
 
         Option classes = Option.builder( "c" ).argName( "classes-dir" )
                 .hasArg( )
-                .desc( "The parent directory that contains the classes of the specified package {e.g. 'build/classes'}" )
+                .desc( "The parent directory that contains the classes of the specified package {e.g. 'build/classes'}." )
                 .required( ).build( );
 
         Option gavs = Option.builder( "g" ).argName( "gav-coordinates" )
                 .hasArgs( )
-                .desc( "A space-delimited sequence of Maven-style G:A:V dependency coordinates {e.g. org.example:my-api:10.18[,eg.foo.wow:anartifactid:v8][,...]}" )
+                .desc( "A space-delimited sequence of Maven-style G:A:V dependency coordinates {e.g. org.example:my-api:10.18[,eg.foo.wow:anartifactid:v8][,...]}." )
                 ./* required(). optionalArg( true ).*/build( );
 
         Option gavsFile = Option.builder( "a" ).argName( "artifacts-gav-file" )
                 .hasArg( )
-                .desc( "In place of the <gav-coordinates> option, you could alternatively provide a new line-separated file containing Maven-style G:A:V dependency coordinates {e.g. com.lingocoder:abinspector:0.4}" )
+                .desc( "In place of the <gav-coordinates> option, you could alternatively provide a new line-separated file containing Maven-style G:A:V dependency coordinates {e.g. com.lingocoder:abinspector:0.4}." )
                 .build( );
 /* 
         Option dependenciesFile = Option.builder( "d" )
@@ -71,8 +71,13 @@ public class CLIHelper {
  */
         Option verbose = Option.builder( "v" )
                 .argName( "verbose" ).hasArg( false )
-                .desc( "Show the names of classes, supertypes, constructors, methods, parameters, return types and annotations that are exposed in the analyzed API" )
+                .desc( "Show a verbose report. Includes the names of classes, supertypes, constructors, methods, parameters, return types and annotations that are exposed in the analyzed API." )
                 .build( );
+                
+        Option summary = Option.builder( "s" )
+                        .argName( "summary" ).hasArg( false )
+                        .desc( "Show a summary with only the G:A:V coordinates of dependencies. G:A:Vs are mapped to an aggregate count of times a dependency is used. Usage can be either as supertypes, constructors, methods, parameters, return types or annotations that are exposed in the analyzed API. Counts are approximate." )
+                        .build( );
 
         gavOptGrp.addOption( gavs );
 
@@ -87,6 +92,8 @@ public class CLIHelper {
         options.addOptionGroup( gavOptGrp )/* .addOption( gav ) */;
 
         options.addOption( verbose );
+        
+        options.addOption( summary );
         
         CommandLineParser parser = new DefaultParser( );
 

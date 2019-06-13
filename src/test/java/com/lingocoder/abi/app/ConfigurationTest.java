@@ -19,7 +19,6 @@
 package com.lingocoder.abi.app;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 import java.util.Set;
 
@@ -42,7 +41,7 @@ public class ConfigurationTest extends BaseAbiTest {
 	@Before
 	public void setUp( ) {
 		this.classUnderTest = new Configuration( this.projectClassesRoot,
-				this.definedDependencies, new String[ ] { this.projectClassesSpecificPackage }, false );
+				this.definedDependencies, new String[ ] { this.projectClassesSpecificPackage }, false, false );
 	}
 
 	@Test

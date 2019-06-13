@@ -17,13 +17,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package com.lingocoder.abi;
+
+import static com.lingocoder.abi.io.AbiIo.print;
+import static com.lingocoder.abi.io.AbiIo.summarize;
 import static com.lingocoder.poc.ProjectClass.projectClass1;
+import static com.lingocoder.poc.ProjectClass.projectClass2;
+import static com.lingocoder.poc.ProjectClass.projectClass3;
 import static com.lingocoder.poc.ProjectClass.projectClass4;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.jar.JarFile;
 
 import org.junit.Before;
@@ -41,10 +50,22 @@ public class ReportingJarAbiInspectorTest extends BaseReportingAbiInspectorTest 
 	public void setUp( ) throws Exception {
 
 		this.classUnderTest = new ReportingJarAbiInspector<>( );
+		
+		this.aDependency = this.artifact1Path.toFile( );		
 
-		this.aDependency = this.artifact1Path.toFile( );
+		this.dependency1 = this.artifact1Path.toFile( );
+
+		this.dependency2 = this.artifact2Path.toFile( );
+
+		this.dependency3 = this.artifact3Path.toFile( );
 
 		this.dependency4 = this.artifact4Path.toFile( );
+
+		this.dependency5 = this.artifact5Path.toFile( );
+
+		this.dependency6 = this.artifact6Path.toFile( );
+
+		this.dependency7 = this.artifact7Path.toFile( );
 	}
 	
 	@Test
@@ -85,6 +106,37 @@ public class ReportingJarAbiInspectorTest extends BaseReportingAbiInspectorTest 
 
 		actual.print( );
 
-		assertTrue(  expected4.getLines( ).containsAll( actual.getLines( ) ) );
+		assertTrue( expected4.getLines( ).containsAll( actual.getLines( ) ) );
+	}
+
+
+	@Test
+	public void testSummarizeMapsExpectedGAVs( )
+			throws IOException {
+
+		Set<JarFile> dependencies = Set.of( new JarFile( this.dependency1 ),
+			new JarFile( this.dependency2 ),
+				new JarFile( this.dependency3 ) );
+
+		Set<Reporting> actualReports = new HashSet<>( );
+
+		Set.of( projectClass1, projectClass2, projectClass3 ).stream( ).forEach( aProjectClass -> {
+		
+		    Reporting actualReport = classUnderTest.inspect( aProjectClass, dependencies );
+			actualReports.add( actualReport );
+
+		    } );
+		
+		Map<String, LongAdder> actualSummary = ( (Summarizer) this.classUnderTest ).summarize( );
+		
+		summarize( actualSummary );
+
+/* 		print( actualReports ); */
+		Set<String> allGAVs = new HashSet<>( );
+		
+		actualReports.forEach( rpt -> allGAVs.addAll( rpt.getGAVs( ) ) );
+
+		allGAVs.forEach( expectedGAV -> assertTrue( actualSummary.containsKey( expectedGAV ) ) );
+		
 	}
 }

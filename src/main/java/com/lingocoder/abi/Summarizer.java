@@ -16,46 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.lingocoder.abi.app;
-
-import static com.lingocoder.abi.io.AbiIo.print;
-import static com.lingocoder.abi.io.AbiIo.summarize;
-/* import static com.lingocoder.abi.io.CmdLineInterface.dependenciesFile; */
-import static com.lingocoder.abi.io.CmdLineInterface.parseArgs;
+package com.lingocoder.abi;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.LongAdder;
 
-import com.lingocoder.abi.Reporting;
+public interface Summarizer {
 
-public class AbiApp {
-
-	static public void main( String... args ) {
-
-		Configuration conf = parseArgs( args );
-
-		Abi app = new Abi( conf );
-
-
-		if ( conf.isSummarizing( ) ) {
-
-			Map<String, LongAdder> summarizedAbi = app.nschpect( );
-		
-		    summarize( summarizedAbi );
-		
-		} 
-		if ( conf.isVerbose( ) ) {
-
-			Set<Reporting> gatheredAbi = app.nspect( );
-		
-		    print( gatheredAbi );
-		
-		} else {
-			
-			Map<Class<?>, Set<String>> groupedAbi = app.inspect( );
-
-			print( groupedAbi );
-		}
-	}
+    Map<String, LongAdder> summarize( );
 }

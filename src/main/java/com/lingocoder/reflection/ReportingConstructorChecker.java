@@ -25,7 +25,7 @@ import static java.util.Collections.emptySet;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.Set;
 import static java.util.stream.Collectors.toCollection;
@@ -63,19 +63,19 @@ public class ReportingConstructorChecker<T, U, V> implements
 
             if ( Modifier.isPublic( aMethod.getModifiers( ) )/*  && !in(aMethod.getName(), projPkgs) */)  {
 
-                constructorTypes = Arrays.asList( aMethod.getParameterTypes( ) )
-                        .stream( ).parallel( ).filter(typ -> !typ.isPrimitive( ) ).filter( ReflectionHelper::notJdk ).filter(typ -> !in(typ, projPkgs))
+                constructorTypes = List.of( aMethod.getParameterTypes( ) )
+                        .parallelStream( ).filter(typ -> !typ.isPrimitive( ) ).filter( ReflectionHelper::notJdk ).filter(typ -> !in(typ, projPkgs))
                         .collect(  toSet( ) );
 
                 paramLines.addAll( constructorTypes
-                        .stream( ).parallel( ).filter(typ -> !typ.isPrimitive( ) ).filter( ReflectionHelper::notJdk ).filter(typ -> !in(typ, projPkgs))
+                        .parallelStream( ).filter(typ -> !typ.isPrimitive( ) ).filter( ReflectionHelper::notJdk ).filter(typ -> !in(typ, projPkgs))
                         .map( cls -> {
                             tracker[ 0 ]++;
                             return new ReportEntry( "param", cls.getName( ),
                                     noLines, noGAVs );
                         } ).collect( toCollection( ConcurrentSkipListSet::new ) ) );
 
-                types.addAll( constructorTypes.stream( ).parallel( )
+                types.addAll( constructorTypes.parallelStream( )
                         .map( cls -> cls.getName( ) )
                         .collect( toCollection( ConcurrentSkipListSet::new ) ) );
                 /*

@@ -41,8 +41,10 @@ public class Configuration {
 
 	private final boolean verbose;
 
+	private final boolean summarize;
+
 	public Configuration( Path classesDir, Set<String> gavs,
-			String[ ] packagesToScan, boolean verbose ) {
+			String[ ] packagesToScan, boolean verbose, boolean summarize ) {
 		
 		this.classesDir = classesDir;
 
@@ -53,6 +55,8 @@ public class Configuration {
 		this.dependencies = this.cpFilter.filterClassPath( gavs );
 		
 		this.verbose = verbose;
+
+		this.summarize = summarize;
 	}
 
 	protected Path getClassesDir( ) {
@@ -74,4 +78,8 @@ public class Configuration {
 	public boolean isVerbose( ) {
 		return verbose;
 	}
+
+	public boolean isSummarizing( ) {
+		return summarize;
+	}	
 }

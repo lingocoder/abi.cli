@@ -19,9 +19,9 @@
 package com.lingocoder.abi.app;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
@@ -29,7 +29,9 @@ import com.lingocoder.abi.GatheringAbiInspector;
 import com.lingocoder.abi.GroupingAbiInspector;
 import com.lingocoder.abi.JarGatheringAbiInspector;
 import com.lingocoder.abi.JarGroupingAbiInspector;
+import com.lingocoder.abi.JarSummarizingAbiInspector;
 import com.lingocoder.abi.Reporting;
+import com.lingocoder.abi.SummarizingAbiInspector;
 import com.lingocoder.classic.Classifier;
 import com.lingocoder.file.Lookup;
 import com.lingocoder.jar.JarFiler;
@@ -40,6 +42,7 @@ public class Abi {
 
 	private final GroupingAbiInspector<Class<?>, JarFile, Set<String>> abi;
 	private final GatheringAbiInspector<Reporting, Class<?>, JarFile> abI;
+	private final SummarizingAbiInspector<Map<String, LongAdder>, Class<?>, JarFile> aBi;
 
 	private Path classesDir;
 
@@ -52,7 +55,7 @@ public class Abi {
 
 	private final Lookup<String> finder;
 
-	private final /* static */ Configuration conf;
+	private final Configuration conf;
 
 	public Abi( Configuration conf ) {
 
@@ -60,6 +63,7 @@ public class Abi {
 	
 		this.abi = new JarGroupingAbiInspector<>( );
 		this.abI = new JarGatheringAbiInspector<>( );
+		this.aBi = new JarSummarizingAbiInspector<>( );
 
 		this.classesDir = DEFAULT_CLASSES_DIR;
 		
@@ -75,6 +79,7 @@ public class Abi {
 
 		this.abi = new JarGroupingAbiInspector<>( );
 		this.abI = new JarGatheringAbiInspector<>( );
+		this.aBi = new JarSummarizingAbiInspector<>( );
 
 		this.classesDir = DEFAULT_CLASSES_DIR;
 
@@ -84,13 +89,9 @@ public class Abi {
 
 		this.finder = new Lookup<>( dependencies );
 
-		this.conf = new Configuration(classesDir, null, new String[]{this.packageToScan}, false );
+		this.conf = new Configuration(classesDir, null, new String[]{this.packageToScan}, false, false );
 	}
-/* 
-	public Abi( ) {
-		this( new Configuration( ) );
-	}
- */
+	
 	protected Path getClassesDir( ) {
 		return classesDir;
 	}
@@ -106,30 +107,10 @@ public class Abi {
 	protected void setPackageToScan( String packageToScan ) {
 		this.packageToScan = packageToScan;
 	}
-/* 
-	protected Map<Class<?>, Set<String>> inspect( String... args ) {
 
-		Set<JarFile> dependencies = this.finder
-				.findInCache( conf.configure( args ) ).stream( )
-				.map( path -> path.toFile( ) ).map( JarFiler::toJarFile )
-				.filter( jar -> jar != null ).collect( Collectors.toSet( ) );
-
-		this.classesDir = conf.getClassesDir( );
-
-		this.packageToScan = conf.getPackageToScan( );
-
-		Set<Class<?>> projectClasses = this.classifier
-				.classify( this.classesDir, this.packageToScan );
-
-		return this.abi.inspect( projectClasses, dependencies );
-	}
- */
 	protected Map<Class<?>, Set<String>> inspect( ) {
 
-		Set<JarFile> dependencies = this.finder.findInCache( conf.getGavs( ) )
-				.stream( ).map( path -> path.toFile( ) )
-				.map( JarFiler::toJarFile ).filter( jar -> jar != null )
-				.collect( Collectors.toSet( ) );
+		Set<JarFile> dependencies = this.resolveDependencies( );
 
 		this.classesDir = conf.getClassesDir( );
 
@@ -140,13 +121,10 @@ public class Abi {
 
 		return this.abi.inspect( projectClasses, dependencies );
 	}
-	
-	protected Set<Reporting> nspect(  ) {
 
-		Set<JarFile> dependencies = this.finder
-				.findInCache( conf.getGavs( ) ).stream( )
-				.map( path -> path.toFile( ) ).map( JarFiler::toJarFile )
-				.filter( jar -> jar != null ).collect( Collectors.toSet( ) );
+	protected Set<Reporting> nspect( ) {
+
+		Set<JarFile> dependencies = this.resolveDependencies( );
 
 		this.classesDir = conf.getClassesDir( );
 
@@ -156,5 +134,25 @@ public class Abi {
 				.classify( this.classesDir, this.packagesToScan );
 
 		return this.abI.inspect( projectClasses, dependencies );
+	}
+
+	protected Map<String, LongAdder> nschpect( ) {
+
+		Set<JarFile> dependencies = this.resolveDependencies( );
+
+		this.classesDir = conf.getClassesDir( );
+
+		this.packagesToScan = conf.getPackagesToScan( );
+
+		Set<Class<?>> projectClasses = this.classifier
+				.classify( this.classesDir, this.packagesToScan );
+
+		return this.aBi.inspect( projectClasses, dependencies );
+	}
+
+	private Set<JarFile> resolveDependencies( ) {
+		return this.finder.findInCache( conf.getGavs( ) ).parallelStream( )
+				.map( path -> path.toFile( ) ).map( JarFiler::toJarFile )
+				.filter( jar -> jar != null ).collect( Collectors.toSet( ) );
 	}	
 }

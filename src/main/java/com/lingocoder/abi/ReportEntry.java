@@ -75,7 +75,7 @@ public class ReportEntry implements Reporting {
 
 		System.out.printf( print );
 
-		this.lines.stream( ).sequential().sorted(comparer).forEach( ntre -> {
+		this.lines.stream( ).sequential().sorted(comparer)/* parallelStream( ) */.forEach( ntre -> {
 			/* System.out.printf("%c ", '\u2502' ) */;
 			ntre.setIndent( spaces + 2 );
 			ntre.print( );
@@ -84,7 +84,7 @@ public class ReportEntry implements Reporting {
 		if ( !this.gavs.isEmpty( ) )
 			System.out.println( "\n|" + "\n|"
 					+ "_________ Dependencies ________\n|" );
-		this.gavs.stream( ).forEach( dep -> System.out.printf( "%s%c %s%n",
+		this.gavs.parallelStream( ).forEach( dep -> System.out.printf( "%s%c %s%n",
 				"|", '*'/* '\u257E' */, dep ) );
 		if ( !this.gavs.isEmpty( ) )
 			System.out.print( "|_______________________________\n" );

@@ -79,6 +79,6 @@ public class CmdLineInterface {
             gavs = toSet( cmd.getOptionValues( gSel ) );
         }
         
-        return new Configuration(classesDir, gavs, packagesToScan, cmd.hasOption("v") );
+        return new Configuration(classesDir, gavs, packagesToScan, cmd.hasOption("v"), cmd.hasOption("s") );
     }
 }

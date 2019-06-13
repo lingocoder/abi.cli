@@ -27,7 +27,7 @@ import static java.util.Collections.emptySet;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.Set;
 import static java.util.stream.Collectors.toCollection;
@@ -67,15 +67,15 @@ public class ReportingMethodChecker<T, U, V> implements
 
             if ( Modifier.isPublic( aMethod.getModifiers( ) ) ) {
 
-                paramTypes = Arrays.asList( aMethod.getParameterTypes( ) )
-                        .stream( ).distinct( ).filter(prm -> !in(prm, projPkgs)).parallel( )
+                paramTypes = List.of( aMethod.getParameterTypes( ) )
+                        .parallelStream( ).distinct( ).filter(prm -> !in(prm, projPkgs)).parallel( )
                         
                            .filter( ReflectionHelper::notJdk ).filter(prm ->
                           !prm.isPrimitive() && !primitiveArray.contains(
                           prm.getTypeName( ) ) )
                          .collect( toSet( ) );
 
-                paramLines.addAll( paramTypes.stream( ).parallel( )
+                paramLines.addAll( paramTypes.parallelStream( )
                         
 /*                          .filter( ReflectionHelper::notJdk ).filter(prm -> !in(prm, projPkgs) ) */
                          .map( cls -> {
@@ -84,23 +84,23 @@ public class ReportingMethodChecker<T, U, V> implements
                                     noLines, noGAVs );
                         } ).collect( toCollection( ConcurrentSkipListSet::new ) ) );
 
-                exceptionTypes = Arrays.asList( aMethod.getExceptionTypes( ) )
-                        .stream( ).distinct( ).filter(exc -> !in( exc, projPkgs ) ).parallel( )
+                exceptionTypes = Set.of( aMethod.getExceptionTypes( ) )
+                        .parallelStream( ).distinct( ).filter(exc -> !in( exc, projPkgs ) ).parallel( )
                         .filter( ReflectionHelper::notJdk )
                         .collect( toSet( ) );
 
-                paramLines.addAll( exceptionTypes.stream( ).parallel( )
+                paramLines.addAll( exceptionTypes.parallelStream( )
                         .filter( ReflectionHelper::notJdk ).map( cls -> {
                             tracker[ 0 ]++;
                             return new ReportEntry( "exception", cls.getName( ),
                                     noLines, noGAVs );
                         } ).collect( toCollection( ConcurrentSkipListSet::new ) ) );
 
-                types.addAll( paramTypes.stream( ).parallel( )
+                types.addAll( paramTypes.parallelStream( )
                         .map( cls -> cls.getName( ) )
                         .collect( toSet( ) ) );
 
-                types.addAll( exceptionTypes.stream( ).parallel( )
+                types.addAll( exceptionTypes.parallelStream( )
                         .map( cls -> cls.getName( ) )
                         .collect( toSet( ) ) );
 

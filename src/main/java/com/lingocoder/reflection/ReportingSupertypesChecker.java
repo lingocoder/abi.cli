@@ -24,7 +24,7 @@ import static com.lingocoder.reflection.ReflectionHelper.permutate;
 import static com.lingocoder.reflection.ReflectionHelper.projPkgs;
 import static java.util.Collections.emptySet;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.Set;
 import static java.util.stream.Collectors.toCollection;
@@ -58,17 +58,17 @@ public class ReportingSupertypesChecker<T, U, V> implements ReportingTypesChecke
 					noLines, noGAVs ) );
 		}
 
-		duperTypes = Arrays.asList( ( (Class<?>) type ).getInterfaces( ) )
-				.stream( ).parallel( ).filter( ReflectionHelper::notJdk ).filter(intf -> !in(intf, projPkgs))
+		duperTypes = List.of( ( (Class<?>) type ).getInterfaces( ) )
+				.parallelStream( ).filter( ReflectionHelper::notJdk ).filter(intf -> !in(intf, projPkgs))
 				.collect( toSet( ) );
 		
 		superTypes.addAll( duperTypes
-				.stream( ).parallel( ).filter( ReflectionHelper::notJdk ).filter(intf -> !in(intf, projPkgs))
+				.parallelStream( ).filter( ReflectionHelper::notJdk ).filter(intf -> !in(intf, projPkgs))
 				.map( cls -> new ReportEntry( "supertype", cls.getName( ),
 				noLines, noGAVs ) )
 				.collect( toCollection( ConcurrentSkipListSet::new ) ) );
 
-				types.addAll(duperTypes.stream( ).parallel( )
+				types.addAll(duperTypes.parallelStream( )
 				.map( cls -> cls.getName( ) ).collect( toCollection( ConcurrentSkipListSet::new ) ) );
 		
 		return superTypes;

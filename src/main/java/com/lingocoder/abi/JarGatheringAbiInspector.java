@@ -33,7 +33,7 @@ public class JarGatheringAbiInspector<T, U, V> implements GatheringAbiInspector<
 
 		Set<Reporting> reports = new ConcurrentSkipListSet<>( new ReportingComparator( ) );
 
-		projectClasses.stream( ).parallel( ).forEach( prjCls -> {
+		projectClasses.parallelStream( ).forEach( prjCls -> {
 			Reporting report = this.jarAbiInspector.inspect( prjCls,
 					dependencies );
 			if ( !report.getGAVs( ).isEmpty( ) )
@@ -50,53 +50,4 @@ public class JarGatheringAbiInspector<T, U, V> implements GatheringAbiInspector<
 
 		return report.getGAVs().isEmpty( ) ? Collections.emptySet() : Set.of( report  );
 	}
-
-
-
-/* 
-	@Override
-	public Map<Class<?>, Reporting> inspect( Class<?> aProjectClass,
-			JarFile aDependency ) {
-
-		Map<Class<?>, Reporting> groupedAbi = new HashMap<>( );
-
-		this.groupBy( aProjectClass, aDependency, groupedAbi );
-
-		return groupedAbi;
-	} */
-/* 
-	@Override
-	public Map<Class<?>, Reporting> inspect( Set<Class<?>> projectClasses,
-			Set<JarFile> dependencies ) {
-
-		Map<Class<?>, Reporting> groupedAbi = new HashMap<>( );
-
-		for ( Class<?> aProjectClass : projectClasses ) {
-
-			for ( JarFile aDependency : dependencies ) {
-
-				this.groupBy( aProjectClass, aDependency, groupedAbi );
-			}
-		}
-
-		return groupedAbi;
-	} */
-/* 
-	private void groupBy( Class<?> aProjectClass, Set<JarFile> dependencies,
-			Map<Class<?>, Reporting> groupedAbi ) {
-
-		Reporting entry = this.jarAbiInspector.inspect( aProjectClass,
-				dependencies );
-
-		if ( entry != null ) {
-			if ( groupedAbi.get( aProjectClass ) == null )
-				groupedAbi.put( aProjectClass, entry ); */
-/* 
-			String jarFilePath = aDependency.getName( );
-
-			gav.toArtifactToken( Paths.get( jarFilePath ) )
-					.ifPresent( artifact -> groupedAbi.get( aProjectClass )
-							.add( artifact ) );
- *//* 		}
-	} */
 }
