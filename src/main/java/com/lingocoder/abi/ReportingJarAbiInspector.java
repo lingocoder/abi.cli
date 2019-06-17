@@ -32,6 +32,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import com.lingocoder.file.GavTokenHelper;
+import static com.lingocoder.reflection.ReflectionHelper.ignoreJdk;
 import com.lingocoder.reflection.ReportingProjectChecker;
 import com.lingocoder.reflection.ReportingTypesChecker;
 
@@ -42,9 +43,6 @@ import com.lingocoder.reflection.ReportingTypesChecker;
 public class ReportingJarAbiInspector<T extends Reporting>
 		implements AbiInspector<Reporting, Set<JarFile>>, Summarizer {
 
-	private final Set<String> ignoreJdk = Set.of( "java.lang.", "sun.", "com.sun.", "javax.",
-			"java.", "jdk." );
-			
 	private final Map<String, Set<String>> dependencyCache = new ConcurrentHashMap<>( );
 
 	private final Map<Class<?>, Set<String>> projClassCache = new ConcurrentHashMap<>( );
@@ -70,15 +68,15 @@ public class ReportingJarAbiInspector<T extends Reporting>
 
 			Set<String> depTypes = memoize( aDependency.getName( ), dependencyCache,
 					( aJar ) -> this.inspect( aDependency ) );
+				if ( depTypes.retainAll( projTypes ) && ( !depTypes.isEmpty( ) ) ) {
 
-			if ( depTypes.retainAll( projTypes ) && !depTypes.isEmpty( ) ) {
+					String aGav = gav
+							.toGAV( Paths.get( aDependency.getName( ) ) );
 
-				String aGav = gav.toGAV( Paths.get( aDependency.getName( ) ) );
-				
-				allGAVs.add( aGav );
+					allGAVs.add( aGav );
 
-				summarizer.enter( aGav, lines );
-			}
+					summarizer.enter( aGav, depTypes, lines );
+				}
 		}
 
 		T report = (T) new ReportEntry( "class", aProjectClass.getName( ), lines,

@@ -101,7 +101,7 @@ public class AbiIo {
 			prntWrtr.println( sumryLineBrk );
 /* 			abiSummary.parallelStream( )
 					.forEach(  map -> map.keySet( ).*/abiSummary.keySet().forEach( gav -> {
-						prntWrtr.print( " " + gav.strip() + ", seen " );
+						prntWrtr.print( " " + gav + ", seen " );
 						prntWrtr.print( abiSummary.get( gav ).sum( ) + " time(s)\n" );
 						prntWrtr.println(sumryLineBrk);
 		} /* ) */);

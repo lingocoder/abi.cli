@@ -35,7 +35,7 @@ public class JarSummarizingAbiInspector<T, U, V> implements
     public Map<String, LongAdder> inspect( Set<Class<?>> projectClasses,
             Set<JarFile> dependencies ) {
 
-        projectClasses.parallelStream( ).forEach( prjCls -> {
+        projectClasses.stream( ).forEach( prjCls -> {
             this.jarAbiInspector.inspect( prjCls, dependencies );
         } );
                                 

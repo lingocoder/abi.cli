@@ -19,37 +19,137 @@
 package com.lingocoder.abi;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DependencySummarizer {
 
-    private final Map<String, LongAdder> dependencyCount = new ConcurrentHashMap<>( );
+    private final Map<String, LongAdder> frequency = new ConcurrentHashMap<>( );
     
-    public long enter( String gav, Collection<Reporting> entries ) {
+    private static final Logger LOG = LoggerFactory.getLogger( "DependencySummarizer" );
 
-        List<Reporting> members = entries.parallelStream( )
-            .flatMap( cls -> cls.getLines( ).parallelStream( ) )
-            .collect( Collectors.toList( ) );
+    public long enter( String gav, Set<String> depTypes, Set<String> projTypes ) {
         
-        List<Reporting> params = members.parallelStream( )
+        if ( depTypes.isEmpty( ) )
+            throw new IllegalArgumentException( "depTypes cannot be empty" );
+
+        var types = new ConcurrentSkipListSet<>( projTypes );
+
+        types.removeIf( t -> !depTypes.contains( t ) );
+        
+        LOG.debug( "{}", types );
+
+        long count = types.size();
+
+        if ( count == 0 ) {
+
+            LOG.debug( "0 size for '{}' {} project types", projTypes.size( ), gav );
+
+            this.logEmptyTypes( depTypes, projTypes );
+        }
+        
+        this.frequency.computeIfAbsent( gav, k -> new LongAdder( ) ).add( count );
+
+        return this.frequency.get( gav ).sum( );
+    }
+
+    public long enter( String gav, Set<String> depTypes, Collection<Reporting> reports ) {
+    
+        if ( depTypes.isEmpty( ) )
+            throw new IllegalArgumentException( "depTypes cannot be empty" );
+    
+        /* Supertypes first; they have no „lines“ */
+        var types = reports.parallelStream( )
+            .filter(mbr -> !mbr.getName().equals("method"))
+            .map( rpt -> rpt.getType( ) )
+            .filter( typ -> depTypes.contains( typ ) )
+            .collect( Collectors.toList( ) );
+         
+        types.addAll( /* Set<Reporting> params =  */reports.parallelStream( )
             .flatMap( mbrs -> mbrs.getLines( ).parallelStream( ) )
-            .collect(Collectors.toList());
-                
+            .map( rpt -> rpt.getType( ) )
+            .filter( typ -> depTypes.contains( typ ) )
+            .collect( Collectors.toList( ) ) );
+        
+        LOG.debug( "{}", types );
+
+        long count = types.size();
+
+        if ( count == 0 ) {
+
+            LOG.debug( "0 size for '{}' {} members", reports.size( ), gav );
+
+            count += this.enter( depTypes, reports );
+        }
+        
+        this.frequency.computeIfAbsent( gav, k -> new LongAdder( ) ).add( count );
+
+        return this.frequency.get( gav ).sum( );
+    }
+
+    public long enter( String gav, Collection<Reporting> reports ) {
+
+        Set<Reporting> members = reports.parallelStream( )
+            .flatMap( mbrs -> mbrs.getLines( ).parallelStream( ) )
+            .collect( Collectors.toSet( ) );
+
+        Set<Reporting> params = members.parallelStream( )
+            .flatMap( prms -> prms.getLines( ).parallelStream( ) )
+            .collect( Collectors.toSet( ) );
+            
         long count = members.size( ) + params.size( );
 
-        dependencyCount.putIfAbsent( gav, new LongAdder( ) );
+        this.frequency.computeIfAbsent( gav, k -> new LongAdder( ) ).add( count );
 
-        dependencyCount.get( gav ).add( count );
+        return this.frequency.get( gav ).sum( );
+    }
+     
+    public long enter( String gav, long count ) {
 
-        return dependencyCount.get( gav ).sum( );
-     }
- 
-     public Map<String, LongAdder> summarize( ){ 
- 
-         return dependencyCount;
-     }
+        this.frequency.computeIfAbsent( gav, k -> new LongAdder( ) ).add( count );
+
+        return this.frequency.get( gav ).sum( );
+    }
+
+    public Map<String, LongAdder> summarize( ) {
+
+        return this.frequency;
+    }
+   
+    private long enter( Set<String> depTypes, Collection<Reporting> reports ) {
+        
+        /* Supertypes first; they have no „lines“ */
+        var types = reports.parallelStream( )
+            .filter(mbr -> !mbr.getName().equals("method"))
+            .map( rpt -> rpt.getType( ) )
+            .collect( Collectors.toList( ) );
+         
+        types.addAll( /* Set<Reporting> params =  */reports.parallelStream( )
+            .flatMap( mbrs -> mbrs.getLines( ).parallelStream( ) )
+            .map( rpt -> rpt.getType( ) )
+            .collect( Collectors.toList( ) ) );
+        
+        this.logEmptyTypes( depTypes, types );
+        
+        return types.size( );
+    }
+
+    private void logEmptyTypes( Set<String> depTypes, Collection<?> types ) {
+
+        LOG.debug( "{}", "__________________________________________" );
+        LOG.debug( "{}", types );
+
+        LOG.debug( "{}", "==========================================" );
+        LOG.debug( "depTypes {} ({}) (isEmpty : {}) depTypes", depTypes, depTypes.size(), depTypes.isEmpty() );
+        LOG.debug( "{}", "==========================================" );
+        LOG.debug( "{}", "__________________________________________" );
+
+    }
 }

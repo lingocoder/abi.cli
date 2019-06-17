@@ -48,7 +48,7 @@ public class AbiTest extends BaseAbiTest {
 
 		this.dependency4 = this.artifact4Path.toFile( );
 	}
-
+ 
 	@Test
 	public void testInspectGroupsOneClassForFourDependencies( )
 			throws IOException {

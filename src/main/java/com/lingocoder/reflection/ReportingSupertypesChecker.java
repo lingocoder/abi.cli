@@ -56,6 +56,7 @@ public class ReportingSupertypesChecker<T, U, V> implements ReportingTypesChecke
 		if ( superClass != null && notJdk( superClass ) && !in(superClass, projPkgs) ) {
 			superTypes.add( new ReportEntry( "supertype", superClass.getName( ),
 					noLines, noGAVs ) );
+			types.add( superClass.getName( ) );		
 		}
 
 		duperTypes = List.of( ( (Class<?>) type ).getInterfaces( ) )
@@ -68,7 +69,7 @@ public class ReportingSupertypesChecker<T, U, V> implements ReportingTypesChecke
 				noLines, noGAVs ) )
 				.collect( toCollection( ConcurrentSkipListSet::new ) ) );
 
-				types.addAll(duperTypes.parallelStream( )
+		types.addAll(duperTypes.parallelStream( )
 				.map( cls -> cls.getName( ) ).collect( toCollection( ConcurrentSkipListSet::new ) ) );
 		
 		return superTypes;

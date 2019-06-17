@@ -31,8 +31,6 @@ import org.junit.Test;
 
 public class DependencySummarizerTest extends BaseReportingAbiInspectorTest {
 
-    private static final String GAV1 = "org.apache.commons:commons-math:2.2";
-    
     private DependencySummarizer classUnderTest;
 
     @Before
@@ -82,22 +80,39 @@ public class DependencySummarizerTest extends BaseReportingAbiInspectorTest {
 
         actual = this.classUnderTest.enter( GAV1, Set.of( this.expected1 ) );
 
-        assertEquals( expected, actual);
+        assertEquals( expected, actual );
 
         actualSummary = this.classUnderTest.summarize( );
 
         assertEquals( expected, actualSummary.get( GAV1 ).longValue( ) );
-    
+
         expected = 9;
 
-        actual = this.classUnderTest.enter( GAV1, Set.of( this.expected4) );
-        
+        actual = this.classUnderTest.enter( GAV1, Set.of( this.expected4 ) );
+
         assertEquals( expected, actual );
-        
+
         actualSummary = this.classUnderTest.summarize( );
 
         assertEquals( expected, actualSummary.get( GAV1 ).longValue( ) );
+
+        summarize( actualSummary );
+    }
     
-        summarize(actualSummary);
-    }    
+    @Test
+    public void testInspectSummarizesSupertypes( ) throws Exception {
+        
+        Set<String> depTypes = Set.of( "com.google.protobuf.AbstractParser",
+                "com.google.protobuf.InvalidProtocolBufferException",
+                "com.google.protobuf.CodedInputStream",
+                "com.google.protobuf.ExtensionRegistryLite" );
+
+        Set<String> projTypes = depTypes;
+
+        var expectedFreq = 4L;
+
+        var actualFreq = this.classUnderTest.enter( GAV3, depTypes, projTypes );
+
+        assertEquals( expectedFreq, actualFreq );
+    }
 }

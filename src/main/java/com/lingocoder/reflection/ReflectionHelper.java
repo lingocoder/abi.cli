@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class ReflectionHelper {
 
-	protected static Set<String> ignoreJdk = Set.of( "java.lang", "sun", "com.sun",
+	public static Set<String> ignoreJdk = Set.of( "java.lang", "sun", "com.sun",
 			"javax", "java", "jdk", "java.util", "java.io", "javax.annotation",
 			"java.net", "java.nio", "java.math", "java.lang.Object",
 			"java.security", "[Ljava.lang", "[Lsun", "[Lcom.sun",

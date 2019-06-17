@@ -44,6 +44,10 @@ public class BaseAbiCheckerTest {
 
 	protected Path artifact7Path;
 
+	protected Path artifact8Path;
+
+	protected Path artifact9Path;
+
 	protected Set<Path> allDependencPaths;
 
 	protected Set<Class<?>> expectedProjectClasses = Set.of( ProjectClass.class,
@@ -95,10 +99,15 @@ public class BaseAbiCheckerTest {
 				System.getenv("GRADLE_USER_HOME"), "/caches/modules-2/files-2.1/de.huxhorn.sulky/de.huxhorn.sulky.generics/8.2.0/6821b3791399d14c3e03aaededa95069feca591/de.huxhorn.sulky.generics-8.2.0.jar" );
 
 		this.artifact7Path = Paths.get(
-				System.getenv("GRADLE_USER_HOME"), "/caches/modules-2/files-2.1/jp.dodododo.janerics/janerics/1.0.1/bb363a3612c390cc7708b2f33a5133963a2ac486/janerics-1.0.1.jar" );
+				System.getenv( "GRADLE_USER_HOME" ), "/caches/modules-2/files-2.1/jp.dodododo.janerics/janerics/1.0.1/bb363a3612c390cc7708b2f33a5133963a2ac486/janerics-1.0.1.jar" );
 
+		this.artifact8Path = Paths.get(
+				System.getenv( "GRADLE_USER_HOME" ), "/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.12.3/4a1c4c7b89298e7a00e83e4b3bc75af9cc6307f1/okhttp-3.12.3.jar" );
+		
+		this.artifact9Path = Paths.get(
+			System.getenv( "GRADLE_USER_HOME" ), "/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/3.7.1/bce1b6dc9e4531169542ab37a1c8641bcaa8afb/protobuf-java-3.7.1.jar");		
 		this.allDependencPaths = Set.of( this.artifact1Path, this.artifact2Path,
 				this.artifact3Path, this.artifact4Path, this.artifact5Path,
-				this.artifact6Path, this.artifact7Path );
+				this.artifact6Path, this.artifact7Path, this.artifact8Path );
 	}
 }
