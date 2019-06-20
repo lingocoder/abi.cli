@@ -21,7 +21,6 @@ package com.lingocoder.reflection.test;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
-
 import com.lingocoder.file.CachedArtifactFinder;
 import com.lingocoder.poc.Frankenstein;
 import com.lingocoder.poc.HttpClientWrapper;
@@ -47,6 +46,10 @@ public class BaseAbiCheckerTest {
 	protected Path artifact8Path;
 
 	protected Path artifact9Path;
+
+	protected Path artifact10Path;
+
+	protected Path artifact11Path;
 
 	protected Set<Path> allDependencPaths;
 
@@ -77,7 +80,7 @@ public class BaseAbiCheckerTest {
 			"org.apache.httpcomponents:httpclient:4.5.3",
 			"com.fasterxml.jackson.core:jackson-annotations:2.9.8",
 			/* "org.apache.commons:commons-lang3:3.5", */"com.lingocoder:jarexec.plugin:0.3" );
-
+	
 	protected BaseAbiCheckerTest( ) {
 
 		this.artifact1Path = Paths.get(
@@ -105,9 +108,13 @@ public class BaseAbiCheckerTest {
 				System.getenv( "GRADLE_USER_HOME" ), "/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.12.3/4a1c4c7b89298e7a00e83e4b3bc75af9cc6307f1/okhttp-3.12.3.jar" );
 		
 		this.artifact9Path = Paths.get(
-			System.getenv( "GRADLE_USER_HOME" ), "/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/3.7.1/bce1b6dc9e4531169542ab37a1c8641bcaa8afb/protobuf-java-3.7.1.jar");		
-		this.allDependencPaths = Set.of( this.artifact1Path, this.artifact2Path,
-				this.artifact3Path, this.artifact4Path, this.artifact5Path,
-				this.artifact6Path, this.artifact7Path, this.artifact8Path );
+				System.getenv( "GRADLE_USER_HOME" ),
+				"/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/3.7.1/bce1b6dc9e4531169542ab37a1c8641bcaa8afb/protobuf-java-3.7.1.jar" );
+	
+		this.artifact10Path = Paths.get(
+			System.getenv( "GRADLE_USER_HOME" ),"/caches/modules-2/files-2.1/com.google.guava/guava/27.1-android/a80ef47421d6607e749f8b7282dd7dee61adfea7/guava-27.1-android.jar");		
+
+     	this.artifact11Path = Paths.get(
+				System.getenv("M2_REPO"), "/org/bitcoinj/bitcoinj-core/0.16-SNAPSHOT/bitcoinj-core-0.16-SNAPSHOT.jar" );		
 	}
 }

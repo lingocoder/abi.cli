@@ -18,7 +18,6 @@
  */
 package com.lingocoder.abi;
 
-import static com.lingocoder.abi.io.AbiIo.print;
 import static com.lingocoder.abi.io.AbiIo.summarize;
 import static com.lingocoder.poc.ProjectClass.projectClass1;
 import static com.lingocoder.poc.ProjectClass.projectClass2;
@@ -46,26 +45,31 @@ public class ReportingJarAbiInspectorTest extends BaseReportingAbiInspectorTest 
 	
 	private AbiInspector<Reporting, Set<JarFile>> classUnderTest;
 
+	private String bitcoinjGAV = "org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT";
+
+	private String cmnsMathGAV = "org.apache.commons:commons-math:2.2";
+ 
 	@Before
 	public void setUp( ) throws Exception {
 
 		this.classUnderTest = new ReportingJarAbiInspector<>( );
 		
-		this.aDependency = this.artifact1Path.toFile( );		
+		this.aDependency = this.finder.findInCache(  "org.apache.httpcomponents:httpclient:4.5.3" ).orElse( this.artifact1Path ).toFile( );
+		
+		this.dependency1 = this.aDependency;
 
-		this.dependency1 = this.artifact1Path.toFile( );
+		this.dependency2 = this.finder.findInCache(  "com.lingocoder:jarexec.plugin:0.3" ).orElse( this.artifact2Path ).toFile( );
 
-		this.dependency2 = this.artifact2Path.toFile( );
+		this.dependency3 = this.finder.findInCache(  "com.fasterxml.jackson.core:jackson-annotations:2.9.8" ).orElse( this.artifact3Path ).toFile( );
 
-		this.dependency3 = this.artifact3Path.toFile( );
+		this.dependency4 = this.finder.findInCache(  bitcoinjGAV ).orElse( this.artifact4Path ).toFile( );
 
-		this.dependency4 = this.artifact4Path.toFile( );
+		this.dependency5 = this.finder.findInCache(  cmnsMathGAV ).orElse( this.artifact5Path ).toFile( );
 
-		this.dependency5 = this.artifact5Path.toFile( );
+		this.dependency6 = this.finder.findInCache(  "de.huxhorn.sulky:de.huxhorn.sulky.generics:8.2.0" ).orElse( this.artifact6Path ).toFile( );
 
-		this.dependency6 = this.artifact6Path.toFile( );
+		this.dependency7 = this.finder.findInCache(  "jp.dodododo.janerics:janerics:1.0.1" ).orElse( this.artifact7Path ).toFile( );
 
-		this.dependency7 = this.artifact7Path.toFile( );
 	}
 	
 	@Test
@@ -91,10 +95,10 @@ public class ReportingJarAbiInspectorTest extends BaseReportingAbiInspectorTest 
 	public void testInspectBuildsReportingStructureForFour( ) throws Exception {
 
 		Reporting actual = this.classUnderTest.inspect( projectClass4,
-				Set.of( new JarFile( this.artifact4Path.toFile( ) ),
-						new JarFile( this.artifact5Path.toFile( ) ),
-						new JarFile( this.artifact6Path.toFile( ) ),
-						new JarFile( this.artifact7Path.toFile( ) ) ) );
+				Set.of( new JarFile( this.dependency4 ),
+						new JarFile( this.dependency5 ),
+						new JarFile( this.dependency6 ),
+						new JarFile( this.dependency7 ) ) );
 
 		assertEquals( expected4.getName( ), actual.getName( ) );
 		assertEquals( expected4.getType( ), actual.getType( ) );

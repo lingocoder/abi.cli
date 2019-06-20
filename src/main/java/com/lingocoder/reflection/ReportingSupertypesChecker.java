@@ -20,15 +20,15 @@ package com.lingocoder.reflection;
 
 import static com.lingocoder.reflection.ReflectionHelper.in;
 import static com.lingocoder.reflection.ReflectionHelper.notJdk;
-import static com.lingocoder.reflection.ReflectionHelper.permutate;
 import static com.lingocoder.reflection.ReflectionHelper.projPkgs;
 import static java.util.Collections.emptySet;
-
-import java.util.List;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.Set;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toSet;
+
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+
 import com.lingocoder.abi.ReportEntry;
 import com.lingocoder.abi.Reporting;
 import com.lingocoder.abi.ReportingComparator;
@@ -42,10 +42,6 @@ public class ReportingSupertypesChecker<T, U, V> implements ReportingTypesChecke
     @Override
 
 	public Set<Reporting> check( Class<?> type, Set<String> types ) {
-
-        projPkgs.addAll( permutate( type.getName( ) ) );
-        
-        projPkgs.addAll( permutate( "[L" + type.getName( ) ) );
 
 		Set<Class<?>> duperTypes = null;
 

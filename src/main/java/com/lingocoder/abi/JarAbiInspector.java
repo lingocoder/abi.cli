@@ -81,7 +81,7 @@ public class JarAbiInspector implements AbiInspector<Set<String>, JarFile> {
 				String name = entry.getName( );
 
 				if ( name.endsWith( ".class" ) && !name.startsWith( "META-INF" )
-						&& !name.contains( "$" ) && !ignore.contains( name ) ) {
+/* 						&& !name.contains( "$" ) */ && !ignore.contains( name ) ) {
 
 					jarClasses.add( toBinaryName( name )
 /* 							name.replace( "/", "." ).replace( ".class", "" ) */ );

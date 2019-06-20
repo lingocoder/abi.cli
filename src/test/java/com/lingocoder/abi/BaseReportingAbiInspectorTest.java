@@ -53,7 +53,4 @@ public class BaseReportingAbiInspectorTest extends BaseAbiInspectorTest {
   
 	protected File aDependency;
 
-    protected static final String GAV1 = "org.apache.commons:commons-math:2.2";
-    protected static final String GAV2 = "com.squareup.okhttp3:okhttp:3.12.3";    
-    protected static final String GAV3 = "com.google.protobuf:protobuf-java:3.7.1";
 }

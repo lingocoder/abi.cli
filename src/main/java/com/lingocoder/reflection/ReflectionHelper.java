@@ -26,10 +26,10 @@ public class ReflectionHelper {
 	public static Set<String> ignoreJdk = Set.of( "java.lang", "sun", "com.sun",
 			"javax", "java", "jdk", "java.util", "java.io", "javax.annotation",
 			"java.net", "java.nio", "java.math", "java.lang.Object",
-			"java.security", "[Ljava.lang", "[Lsun", "[Lcom.sun",
+			"java.security", "java.sql", "java.text", "javax.net", "[Ljava.lang", "[Lsun", "[Lcom.sun",
 			"[Ljavax", "[Ljava", "[Ljdk", "[Ljava.util", "[Ljava.io", "[Ljavax.annotation",
 			"[Ljava.net", "[Ljava.nio", "[Ljava.math", "[Ljava.lang.Object",
-			"[Ljava.security" );
+			"[Ljava.security", "[Ljava.sql", "[Ljava.text", "[Ljavax.net" );
 
 	protected static final Set<String> primitiveArray = Set.of( "char[]", "short[]", "byte[]",
 	"int[]", "long[]", "float[]", "double[]", "char", "short", "byte",
@@ -107,10 +107,23 @@ public class ReflectionHelper {
 		for ( String aPkg : permutations ) {
 
 			if ( ignore.contains( aPkg ) ) {
-/* 				System.out.println("'" + aClassName + "' is in " + ignore ); */
+
 				return true;
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Prepare all the types from the project that will be filtered out of the analysis process.
+	 * 
+	 * @param projTypes The {@link Set} of types used in the project being analyzed.
+	 */
+	public static void prime( Set<Class<?>> projTypes ) {
+		
+		projTypes.parallelStream().forEach( type -> projPkgs.addAll( permutate( type.getName( ) ) ) );
+        
+		projTypes.parallelStream().forEach( type -> projPkgs.addAll( permutate( "[L" + type.getName( ) ) ) );        
+        
 	}
 }

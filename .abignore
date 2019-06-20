@@ -1,2 +1,5 @@
 org.bitcoinj.crypto.LinuxSecureRandom
 org.bitcoin.Secp256k1Context
+org.iq80.leveldb.DBFactory
+org.iq80.leveldb.DBException
+org.bitcoinj.crypto.MnemonicCode

@@ -18,14 +18,13 @@
  */
 package com.lingocoder.reflection;
 
-import static com.lingocoder.reflection.ReflectionHelper.permutate;
 import static com.lingocoder.reflection.ReflectionHelper.in;
 import static com.lingocoder.reflection.ReflectionHelper.notJdk;
 import static com.lingocoder.reflection.ReflectionHelper.projPkgs;
 import static java.util.Collections.emptySet;
 
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import com.lingocoder.abi.ReportEntry;
 import com.lingocoder.abi.Reporting;
@@ -42,10 +41,6 @@ public class ReportingAnnotationChecker<T, U, V> implements
 
     @Override
     public Set<Reporting> check( Class<?> type, Set<String> types ) {
-
-        projPkgs.addAll( permutate( type.getName( ) ) );
-        
-        projPkgs.addAll( permutate( "[L" + type.getName( ) ) );
 
 		Set<Reporting> annotationLines = new ConcurrentSkipListSet<>( new ReportingComparator( )  );
 

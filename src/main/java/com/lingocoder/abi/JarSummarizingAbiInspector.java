@@ -18,6 +18,8 @@
  */
 package com.lingocoder.abi;
 
+import static com.lingocoder.reflection.ReflectionHelper.prime;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.LongAdder;
@@ -34,7 +36,8 @@ public class JarSummarizingAbiInspector<T, U, V> implements
     @Override
     public Map<String, LongAdder> inspect( Set<Class<?>> projectClasses,
             Set<JarFile> dependencies ) {
-
+        System.out.printf( "%n%n'%d' Project Classes%n%n", projectClasses.size( ) );
+        prime( projectClasses );
         projectClasses.stream( ).forEach( prjCls -> {
             this.jarAbiInspector.inspect( prjCls, dependencies );
         } );

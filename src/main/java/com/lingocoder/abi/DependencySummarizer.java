@@ -66,14 +66,15 @@ public class DependencySummarizer {
             throw new IllegalArgumentException( "depTypes cannot be empty" );
     
         /* Supertypes first; they have no „lines“ */
-        var types = reports.parallelStream( )
+        var types = reports.stream( )
             .filter(mbr -> !mbr.getName().equals("method"))
             .map( rpt -> rpt.getType( ) )
             .filter( typ -> depTypes.contains( typ ) )
             .collect( Collectors.toList( ) );
-         
-        types.addAll( /* Set<Reporting> params =  */reports.parallelStream( )
-            .flatMap( mbrs -> mbrs.getLines( ).parallelStream( ) )
+
+        types.addAll( /* Set<Reporting> params =  */reports.stream( )
+        .filter(mbr -> mbr.getName().equals("method") || mbr.getName().equals("constructor") )
+            .flatMap( mbrs -> mbrs.getLines( ).stream( ) )
             .map( rpt -> rpt.getType( ) )
             .filter( typ -> depTypes.contains( typ ) )
             .collect( Collectors.toList( ) ) );

@@ -13,7 +13,7 @@ plugins {
 }
 
 group = 'com.lingocoder'
-version = '0.5.2'
+version = '0.5.3'
 description = "A command line application that scans a Java library and detects whether the library exposes types from its dependencies to the library's consumers."
 
 repositories{
@@ -32,15 +32,15 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     testImplementation 'org.apache.commons:commons-lang3:3.5'
 
-    implementation 'com.lingocoder:lingocoder.core:0.5.2'
+    implementation 'com.lingocoder:lingocoder.core:0.5.3'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
-
+				
     implementation gradleApi()
 
     // https://mvnrepository.com/artifact/org.bitcoinj/bitcoinj-core
-    testImplementation group: 'org.bitcoinj', name: 'bitcoinj-core', version: '0.16-SNAPSHOT'
+    testImplementation group: 'org.bitcoinj', name: 'bitcoinj-core', version: '0.15-SNAPSHOT'
 
     testImplementation 'org.apache.commons:commons-math:2.2'
 
@@ -58,6 +58,14 @@ dependencies {
     testImplementation group: 'org.apache.commons', name: 'commons-csv', version: '1.6'
 
     testImplementation group: 'commons-codec', name: 'commons-codec', version: '1.5'
+
+    testImplementation 'org.fusesource.leveldbjni:leveldbjni-all:1.8'
+
+    testImplementation group: 'com.lingocoder', name: 'jarexec.plugin', version: '0.5.1'
+
+    testImplementation group: 'com.google.protobuf', name: 'protobuf-java', version: '3.7.1'
+
+    testImplementation group: 'com.lingocoder', name: 'jarexec.plugin', version: '0.3'
 }
 
 license { header = file('src/main/resources/META-INF/LICENSE-HEADER.txt') }

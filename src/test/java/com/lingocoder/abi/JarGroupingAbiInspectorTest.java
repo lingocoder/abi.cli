@@ -48,19 +48,19 @@ public class JarGroupingAbiInspectorTest extends BaseAbiInspectorTest {
 
 		this.classUnderTest = new JarGroupingAbiInspector<>( );
 
-		this.dependency1 = this.artifact1Path.toFile( );
+		this.dependency1 = this.finder.findInCache(  "org.apache.httpcomponents:httpclient:4.5.3" ).orElse( this.artifact1Path ).toFile( );
 
-		this.dependency2 = this.artifact2Path.toFile( );
+		this.dependency2 = this.finder.findInCache(  "com.lingocoder:jarexec.plugin:0.3" ).orElse( this.artifact2Path ).toFile( );
 
-		this.dependency3 = this.artifact3Path.toFile( );
+		this.dependency3 = this.finder.findInCache(  "com.fasterxml.jackson.core:jackson-annotations:2.9.8" ).orElse( this.artifact3Path ).toFile( );
 
-		this.dependency4 = this.artifact4Path.toFile( );
+		this.dependency4 = this.finder.findInCache(  "org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT" ).orElse( this.artifact4Path ).toFile( );
 
-		this.dependency5 = this.artifact5Path.toFile( );
+		this.dependency5 = this.finder.findInCache(  "org.apache.commons:commons-math:2.2" ).orElse( this.artifact5Path ).toFile( );
 
-		this.dependency6 = this.artifact6Path.toFile( );
+		this.dependency6 = this.finder.findInCache(  "de.huxhorn.sulky:de.huxhorn.sulky.generics:8.2.0" ).orElse( this.artifact6Path ).toFile( );
 
-		this.dependency7 = this.artifact7Path.toFile( );
+		this.dependency7 = this.finder.findInCache(  "jp.dodododo.janerics:janerics:1.0.1" ).orElse( this.artifact7Path ).toFile( );
 
 	}
 

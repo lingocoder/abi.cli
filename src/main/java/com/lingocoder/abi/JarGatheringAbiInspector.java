@@ -18,6 +18,7 @@
  */
 package com.lingocoder.abi;
 
+import static com.lingocoder.reflection.ReflectionHelper.prime;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.Set;
@@ -31,9 +32,11 @@ public class JarGatheringAbiInspector<T, U, V> implements GatheringAbiInspector<
 	public Set<Reporting> inspect( Set<Class<?>> projectClasses,
 			Set<JarFile> dependencies ) {
 
+		prime( projectClasses );
+				
 		Set<Reporting> reports = new ConcurrentSkipListSet<>( new ReportingComparator( ) );
 
-		projectClasses.parallelStream( ).forEach( prjCls -> {
+		projectClasses.stream( ).forEach( prjCls -> {
 			Reporting report = this.jarAbiInspector.inspect( prjCls,
 					dependencies );
 			if ( !report.getGAVs( ).isEmpty( ) )

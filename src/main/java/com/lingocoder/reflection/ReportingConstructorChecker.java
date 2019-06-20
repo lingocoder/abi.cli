@@ -19,17 +19,16 @@
 package com.lingocoder.reflection;
 
 import static com.lingocoder.reflection.ReflectionHelper.in;
-import static com.lingocoder.reflection.ReflectionHelper.permutate;
 import static com.lingocoder.reflection.ReflectionHelper.projPkgs;
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toSet;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.List;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.Set;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import com.lingocoder.abi.ReportEntry;
 import com.lingocoder.abi.Reporting;
@@ -44,20 +43,12 @@ public class ReportingConstructorChecker<T, U, V> implements
 
     @Override
     public Set<Reporting> check( Class<?> type, Set<String> types ) {
-
-        projPkgs.addAll( permutate( type.getName( ) ) );
-        
-        projPkgs.addAll( permutate( "[L" + type.getName( ) ) );
         
         Set<Class<?>> constructorTypes = null;
 
         Set<Reporting> paramLines = new ConcurrentSkipListSet<>( new ReportingComparator( ) );
 
         Set<Reporting> constructors = new ConcurrentSkipListSet<>( new ReportingComparator( ) );
-
-        int[ ] tracker = { 0 };
-
-        int counter = 0;
 
         for ( Constructor<?> aMethod : type.getDeclaredConstructors( ) ) {
 
@@ -68,9 +59,8 @@ public class ReportingConstructorChecker<T, U, V> implements
                         .collect(  toSet( ) );
 
                 paramLines.addAll( constructorTypes
-                        .parallelStream( ).filter(typ -> !typ.isPrimitive( ) ).filter( ReflectionHelper::notJdk ).filter(typ -> !in(typ, projPkgs))
+                        .parallelStream( )
                         .map( cls -> {
-                            tracker[ 0 ]++;
                             return new ReportEntry( "param", cls.getName( ),
                                     noLines, noGAVs );
                         } ).collect( toCollection( ConcurrentSkipListSet::new ) ) );
@@ -78,15 +68,10 @@ public class ReportingConstructorChecker<T, U, V> implements
                 types.addAll( constructorTypes.parallelStream( )
                         .map( cls -> cls.getName( ) )
                         .collect( toCollection( ConcurrentSkipListSet::new ) ) );
-                /*
-                 * If a parameter type was not added in the notJdk filter
-                 * predicate above, I can't add the corresponding method. So I'm
-                 * keeping track.
-                 */
-                if ( tracker[ 0 ] > counter ){
+
+                if ( !paramLines.isEmpty( ) ){
                     constructors.add( new ReportEntry( "constructor",
-                            aMethod.getName( ), paramLines, noGAVs ) );
-                    counter = tracker[ 0 ];        
+                        aMethod.getName( ), paramLines, noGAVs ) );
                 }            
             }
         }

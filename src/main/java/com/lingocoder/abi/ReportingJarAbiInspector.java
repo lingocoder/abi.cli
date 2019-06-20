@@ -100,7 +100,7 @@ public class ReportingJarAbiInspector<T extends Reporting>
 				String name = entry.getName( );
 
 				if ( name.endsWith( ".class" ) && !name.startsWith( "META-INF" )
-						&& !name.contains( "$" )
+/* 						&& !name.contains( "$" ) */
 						&& !ignoreJdk.contains( name ) ) {
 
 					jarClasses.add( toBinaryName( name ) );

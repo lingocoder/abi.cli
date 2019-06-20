@@ -19,9 +19,9 @@
 package com.lingocoder.abi;
 
 import static com.lingocoder.abi.io.AbiIo.summarize;
-
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.jar.JarFile;
@@ -35,12 +35,17 @@ public class JarSummarizingAbiInspectorTest extends BaseReportingAbiInspectorTes
     private SummarizingAbiInspector<Map<String, LongAdder>, Class<?>, JarFile> classUnderTest;
 
     private Class<?> aProjectClass = HttpDiscovery.class;
+
     private JarFile aDependency;
+
+    private String protobufGAV = "com.google.protobuf:protobuf-java:3.7.1";
+
+    private String okHttpGAV = "com.squareup.okhttp3:okhttp:3.12.3";
 
     @Before
     public void setUp( ) throws Exception {
 
-        this.aDependency = new JarFile( this.artifact8Path.toFile( ) );
+        this.aDependency = new JarFile( this.finder.findInCache( okHttpGAV ).orElse( this.artifact8Path ).toFile( ) );
         
         this.classUnderTest = new JarSummarizingAbiInspector<>( );
 
@@ -66,9 +71,11 @@ public class JarSummarizingAbiInspectorTest extends BaseReportingAbiInspectorTes
 
         Class<?> projectClass = Class.forName(
                 "org.bitcoin.protocols.payments.Protos$X509Certificates$1" );
-        
+
+        File protobuf = this.finder.findInCache( protobufGAV ).orElse( this.artifact9Path ).toFile( );
+
         Map<String, LongAdder> actualSummary = this.classUnderTest.inspect( projectClass,
-                        new JarFile( this.artifact9Path.toFile( ) ) );
+                        new JarFile( protobuf ) );
                 
         summarize( actualSummary );
 

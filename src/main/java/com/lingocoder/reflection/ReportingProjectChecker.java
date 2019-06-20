@@ -19,8 +19,7 @@
 package com.lingocoder.reflection;
 
 import static com.lingocoder.file.Loader.loadIgnore;
-import static java.util.Collections.emptySet;
-
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.Set;
 
@@ -46,9 +45,9 @@ public class ReportingProjectChecker<T, U, V> implements
 	
 	private ReportingTypesChecker<Set<Reporting>, Class<?>, Set<String>> annotationChecker = new ReportingAnnotationChecker<>( );
 
-    final Set<Reporting> noLines = emptySet( );
+	final Set<Reporting> noLines = new HashSet<>( 0 );	
 
-    final Set<String> noGAVs = emptySet( );
+    final Set<String> noGAVsnes = new HashSet<>( 0 );
 
     @Override
 	public Set<String> check( Class<?> aProjectClass,
@@ -75,7 +74,6 @@ public class ReportingProjectChecker<T, U, V> implements
 
 			LOG.debug( "Ignoring Project Class '{}'", className );
 		}
-
 		return projTypes;
 	}
 

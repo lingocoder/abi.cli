@@ -46,7 +46,7 @@ public class AbiTest extends BaseAbiTest {
 
 		this.classUnderTest = new Abi( conf );		
 
-		this.dependency4 = this.artifact4Path.toFile( );
+		this.dependency4 = this.finder.findInCache(  "org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT" ).orElse( this.artifact4Path ).toFile( );
 	}
  
 	@Test

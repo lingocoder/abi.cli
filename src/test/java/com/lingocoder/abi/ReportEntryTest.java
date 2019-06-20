@@ -19,6 +19,7 @@
 package com.lingocoder.abi;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
 import java.util.Collections;
@@ -29,10 +30,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ReportEntryTest extends BaseReportingAbiInspectorTest {
+
+    private String bitcoinjGAV = "org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT";
     
     @Before
     public void setUp( ) {
-        this.dependency4 = this.artifact4Path.toFile( );
+        this.dependency4 = this.finder.findInCache(  bitcoinjGAV ).orElse( this.artifact4Path ).toFile( );
     }
 
     @Test
@@ -59,5 +62,21 @@ public class ReportEntryTest extends BaseReportingAbiInspectorTest {
 
         assertEquals( 2, lines.size( ) );
 
+    }
+
+    @Test
+    public void testEqualsForOverloadedMethods( ) {
+
+        Reporting foo = new ReportEntry("param", "foo", Collections.emptySet(), Collections.emptySet() );
+        Reporting bar = new ReportEntry("param", "bar", Collections.emptySet(), Collections.emptySet() );
+        Reporting baz = new ReportEntry( "return", "baz", Collections.emptySet( ), Collections.emptySet( ) );
+        
+        Reporting method1 = new ReportEntry( "method", "m", Set.of(foo), Collections.emptySet() );
+        Reporting method2 = new ReportEntry( "method", "m", Set.of(foo, bar), Collections.emptySet() );
+        Reporting method3 = new ReportEntry( "method", "m", Set.of( foo, baz ), Collections.emptySet( ) );
+        
+        assertFalse( method1.equals( method2 ) );
+        assertFalse( method3.equals( method2 ) );
+        
     }
 }

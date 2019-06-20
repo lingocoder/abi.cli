@@ -36,6 +36,7 @@ import org.apache.http.client.HttpClient;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.lingocoder.file.Lookup;
 import com.lingocoder.reflection.test.BaseAbiInspectorTest;
 
 public class JarAbiInspectorTest extends BaseAbiInspectorTest {
@@ -43,6 +44,8 @@ public class JarAbiInspectorTest extends BaseAbiInspectorTest {
 	private AbiInspector<Set<String>, JarFile> classUnderTest;
 
 	private File aDependency;
+	
+	private Lookup<String> lookup;
 
 	private Set<String> allTypes = Set.of( String.class.getName( ),
 			HttpClient.class.getName( ), new byte[ 0 ].getClass( ).getName( ),
@@ -51,6 +54,8 @@ public class JarAbiInspectorTest extends BaseAbiInspectorTest {
 
 	private Set<String> expectedTypes = Set.of( HttpClient.class.getName( ) );
 
+	private String httpClientGAV = "org.apache.httpcomponents:httpclient:4.5.3";
+	
 	public JarAbiInspectorTest( ) {
 		super( );
 	}
@@ -59,8 +64,8 @@ public class JarAbiInspectorTest extends BaseAbiInspectorTest {
 	public void setUp( ) {
 
 		this.classUnderTest = new JarAbiInspector( );
-
-		this.aDependency = this.artifact1Path.toFile( );
+    this.lookup = new Lookup<>( this.cpFilter.filterClassPath( Set.of( httpClientGAV ) ) );
+		this.aDependency =  lookup.findInCache( httpClientGAV ).orElse( this.artifact1Path ).toFile( );
 	}
 
 	@Test
