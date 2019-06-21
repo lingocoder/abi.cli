@@ -30,12 +30,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ReportEntryTest extends BaseReportingAbiInspectorTest {
-
-    private String bitcoinjGAV = "org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT";
     
     @Before
     public void setUp( ) {
-        this.dependency4 = this.finder.findInCache(  bitcoinjGAV ).orElse( this.artifact4Path ).toFile( );
+        dependency4 = finder.findInCache( bitcoinjGAV ).orElse( artifact4Path ).toFile( );
     }
 
     @Test

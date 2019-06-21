@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.jar.JarFile;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -45,38 +47,40 @@ public class ReportingJarAbiInspectorTest extends BaseReportingAbiInspectorTest 
 	
 	private AbiInspector<Reporting, Set<JarFile>> classUnderTest;
 
-	private String bitcoinjGAV = "org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT";
-
-	private String cmnsMathGAV = "org.apache.commons:commons-math:2.2";
+	private static File aDependency;
  
+	@BeforeClass
+	public static void setUpOnce( ) throws Exception {
+
+	    aDependency = finder.findInCache( httpClientGAV ).orElse( artifact1Path ).toFile( );
+		
+		dependency1 = aDependency;
+
+		dependency2 = finder.findInCache( jarexecGAV ).orElse( artifact2Path ).toFile( );
+
+		dependency3 = finder.findInCache( jacksonGAV ).orElse( artifact3Path ).toFile( );
+
+		dependency4 = finder.findInCache( bitcoinjGAV ).orElse( artifact4Path ).toFile( );
+
+		dependency5 = finder.findInCache( cmnsMathGAV ).orElse( artifact5Path ).toFile( );
+
+		dependency6 = finder.findInCache( genericsGAV ).orElse( artifact6Path ).toFile( );
+
+		dependency7 = finder.findInCache( janericsGAV ).orElse( artifact7Path ).toFile( );
+
+	}
+	
 	@Before
 	public void setUp( ) throws Exception {
 
-		this.classUnderTest = new ReportingJarAbiInspector<>( );
-		
-		this.aDependency = this.finder.findInCache(  "org.apache.httpcomponents:httpclient:4.5.3" ).orElse( this.artifact1Path ).toFile( );
-		
-		this.dependency1 = this.aDependency;
-
-		this.dependency2 = this.finder.findInCache(  "com.lingocoder:jarexec.plugin:0.3" ).orElse( this.artifact2Path ).toFile( );
-
-		this.dependency3 = this.finder.findInCache(  "com.fasterxml.jackson.core:jackson-annotations:2.9.8" ).orElse( this.artifact3Path ).toFile( );
-
-		this.dependency4 = this.finder.findInCache(  bitcoinjGAV ).orElse( this.artifact4Path ).toFile( );
-
-		this.dependency5 = this.finder.findInCache(  cmnsMathGAV ).orElse( this.artifact5Path ).toFile( );
-
-		this.dependency6 = this.finder.findInCache(  "de.huxhorn.sulky:de.huxhorn.sulky.generics:8.2.0" ).orElse( this.artifact6Path ).toFile( );
-
-		this.dependency7 = this.finder.findInCache(  "jp.dodododo.janerics:janerics:1.0.1" ).orElse( this.artifact7Path ).toFile( );
-
+		this.classUnderTest = new ReportingJarAbiInspector<>( );		
 	}
 	
 	@Test
 	public void testInspectBuildsReportingStructureForOne( ) throws Exception {
 
 		Reporting actual = this.classUnderTest.inspect( projectClass1,
-				Set.of(new JarFile( this.aDependency ) ) );
+				Set.of(new JarFile( aDependency ) ) );
 
 		assertEquals( expected1.getName( ), actual.getName( ) );
 		
@@ -95,10 +99,10 @@ public class ReportingJarAbiInspectorTest extends BaseReportingAbiInspectorTest 
 	public void testInspectBuildsReportingStructureForFour( ) throws Exception {
 
 		Reporting actual = this.classUnderTest.inspect( projectClass4,
-				Set.of( new JarFile( this.dependency4 ),
-						new JarFile( this.dependency5 ),
-						new JarFile( this.dependency6 ),
-						new JarFile( this.dependency7 ) ) );
+				Set.of( new JarFile( dependency4 ),
+						new JarFile( dependency5 ),
+						new JarFile( dependency6 ),
+						new JarFile( dependency7 ) ) );
 
 		assertEquals( expected4.getName( ), actual.getName( ) );
 		assertEquals( expected4.getType( ), actual.getType( ) );
@@ -118,9 +122,9 @@ public class ReportingJarAbiInspectorTest extends BaseReportingAbiInspectorTest 
 	public void testSummarizeMapsExpectedGAVs( )
 			throws IOException {
 
-		Set<JarFile> dependencies = Set.of( new JarFile( this.dependency1 ),
-			new JarFile( this.dependency2 ),
-				new JarFile( this.dependency3 ) );
+		Set<JarFile> dependencies = Set.of( new JarFile( dependency1 ),
+			new JarFile( dependency2 ),
+				new JarFile( dependency3 ) );
 
 		Set<Reporting> actualReports = new HashSet<>( );
 

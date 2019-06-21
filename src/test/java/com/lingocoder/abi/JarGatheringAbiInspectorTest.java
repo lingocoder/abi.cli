@@ -35,6 +35,7 @@ import java.util.jar.JarFile;
 import com.lingocoder.reflection.test.BaseAbiInspectorTest;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JarGatheringAbiInspectorTest extends BaseAbiInspectorTest {
@@ -52,32 +53,35 @@ public class JarGatheringAbiInspectorTest extends BaseAbiInspectorTest {
 		super( );
 	}
 
+	@BeforeClass
+	public static void setUpOnce( ) throws Exception {
+
+		dependency1 = finder.findInCache( httpClientGAV ).orElse( artifact1Path ).toFile( );
+
+		dependency2 = finder.findInCache( jarexecGAV ).orElse( artifact2Path ).toFile( );
+
+		dependency3 = finder.findInCache( jacksonGAV ).orElse( artifact3Path ).toFile( );
+
+		dependency4 = finder.findInCache( bitcoinjGAV ).orElse( artifact4Path ).toFile( );
+
+		dependency5 = finder.findInCache( cmnsMathGAV ).orElse( artifact5Path ).toFile( );
+
+		dependency6 = finder.findInCache( genericsGAV ).orElse( artifact6Path ).toFile( );
+
+		dependency7 = finder.findInCache( janericsGAV ).orElse( artifact7Path ).toFile( );
+	}
+	
 	@Before
 	public void setUp( ) {
 
 		this.classUnderTest = new JarGatheringAbiInspector<>( );
-
-		this.dependency1 = this.finder.findInCache(  "org.apache.httpcomponents:httpclient:4.5.3" ).orElse( this.artifact1Path ).toFile( );
-
-		this.dependency2 = this.finder.findInCache(  "com.lingocoder:jarexec.plugin:0.3" ).orElse( this.artifact2Path ).toFile( );
-
-		this.dependency3 = this.finder.findInCache(  "com.fasterxml.jackson.core:jackson-annotations:2.9.8" ).orElse( this.artifact3Path ).toFile( );
-
-		this.dependency4 = this.finder.findInCache(  "org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT" ).orElse( this.artifact4Path ).toFile( );
-
-		this.dependency5 = this.finder.findInCache(  "org.apache.commons:commons-math:2.2" ).orElse( this.artifact5Path ).toFile( );
-
-		this.dependency6 = this.finder.findInCache(  "de.huxhorn.sulky:de.huxhorn.sulky.generics:8.2.0" ).orElse( this.artifact6Path ).toFile( );
-
-		this.dependency7 = this.finder.findInCache(  "jp.dodododo.janerics:janerics:1.0.1" ).orElse( this.artifact7Path ).toFile( );
 	}
 
 	@Test
 	public void testInspectGathersOneClassForOneDependency( )
 			throws IOException {
 
-		Set<Reporting> actualReports = classUnderTest
-				.inspect( projectClass3, new JarFile( this.dependency3 ) );
+		Set<Reporting> actualReports = classUnderTest.inspect( projectClass3, new JarFile( dependency3 ) );
 
 		Set<String> actualAnnotations = new ConcurrentSkipListSet<>( );		
 
@@ -114,7 +118,7 @@ public class JarGatheringAbiInspectorTest extends BaseAbiInspectorTest {
 			throws IOException {
 
 		Set<Reporting> actualReports = classUnderTest
-				.inspect( this.getClass( ), new JarFile( this.dependency1 ) );
+				.inspect( this.getClass( ), new JarFile( dependency1 ) );
 
 		print( actualReports );
 
@@ -127,8 +131,8 @@ public class JarGatheringAbiInspectorTest extends BaseAbiInspectorTest {
 
 		Set<Reporting> actualReports = classUnderTest
 				.inspect( Set.of( projectClass1, projectClass2 ),
-						Set.of( new JarFile( this.dependency1 ),
-								new JarFile( this.dependency2 ) ) );
+						Set.of( new JarFile( dependency1 ),
+								new JarFile( dependency2 ) ) );
 
 		print( actualReports );
 
@@ -158,9 +162,9 @@ public class JarGatheringAbiInspectorTest extends BaseAbiInspectorTest {
 
 		Set<Reporting> actualReports = classUnderTest
 				.inspect( Set.of( projectClass1, projectClass2, projectClass3 ),
-						Set.of( new JarFile( this.dependency1 ),
-								new JarFile( this.dependency2 ),
-								new JarFile( this.dependency3 ) ) );
+						Set.of( new JarFile( dependency1 ),
+								new JarFile( dependency2 ),
+								new JarFile( dependency3 ) ) );
 
 		print( actualReports );
 
@@ -189,10 +193,10 @@ public class JarGatheringAbiInspectorTest extends BaseAbiInspectorTest {
 
 		Set<Reporting> actualReports = classUnderTest
 				.inspect( Set.of( projectClass4 ),
-						Set.of( new JarFile( this.dependency4 ),
-								new JarFile( this.dependency5 ),
-								new JarFile( this.dependency6 ),
-								new JarFile( this.dependency7 ) ) );
+						Set.of( new JarFile( dependency4 ),
+								new JarFile( dependency5 ),
+								new JarFile( dependency6 ),
+								new JarFile( dependency7 ) ) );
 
 		print( actualReports );
 							

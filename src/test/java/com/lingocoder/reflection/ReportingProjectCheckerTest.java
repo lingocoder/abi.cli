@@ -25,7 +25,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -80,25 +79,19 @@ public class ReportingProjectCheckerTest extends BaseReportingAbiInspectorTest {
 
     private static Set<String> depTypes;
 
-    private static File bitcoinj = Paths.get(
-        System.getenv("M2_REPO"), "/org/bitcoinj/bitcoinj-core/0.15-SNAPSHOT/bitcoinj-core-0.15-SNAPSHOT.jar" ).toFile();
-    
-    private static File protobuf = Paths.get(
-            System.getenv( "GRADLE_USER_HOME" ),
-            "/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/3.7.1/bce1b6dc9e4531169542ab37a1c8641bcaa8afb/protobuf-java-3.7.1.jar" ).toFile( );
+    private static File bitcoinj = finder.findInCache( bitcoinjGAV ).orElse( artifact4Path ).toFile( );
+        
+    private static File protobuf = finder.findInCache( protobufGAV ).orElse( artifact9Path ).toFile( );
 
-    private static File guava = Paths.get(
-            System.getenv( "GRADLE_USER_HOME" ),
-            "/caches/modules-2/files-2.1/com.google.guava/guava/27.1-android/a80ef47421d6607e749f8b7282dd7dee61adfea7/guava-27.1-android.jar" ).toFile( );
+    private static File guava = finder.findInCache( guavaGAV ).orElse( artifact10Path ).toFile( );
 
-    private static File bitcoinj16 = Paths.get(
-                System.getenv("M2_REPO"), "/org/bitcoinj/bitcoinj-core/0.16-SNAPSHOT/bitcoinj-core-0.16-SNAPSHOT.jar" ).toFile();
+/*     private static File bitcoinj16 = finder.findInCache( bitcoinj16GAV ).orElse( artifact11Path ).toFile( ); */
                         
 
     @BeforeClass
     public static void setUpOnce( ) throws Exception {
 
-        classesDir = new JarFile( bitcoinj16 );
+        classesDir = new JarFile( bitcoinj );
 
         aDependency = new JarFile( guava );
 

@@ -37,19 +37,19 @@ import jp.dodododo.janerics.exception.UnsupportedTypeException;
 
 public class BaseReportingAbiInspectorTest extends BaseAbiInspectorTest {
     
-	protected Reporting expectedParam1 = new ReportEntry("param", HttpClient.class.getName(), Collections.emptySet(), Collections.emptySet());
-	protected Reporting expectedConstructor1 = new ReportEntry("constructor", projectClass1.getName(), Set.of(expectedParam1), Collections.emptySet() );
-	protected Reporting expected1 = new ReportEntry("class", projectClass1.getName( ), Set.of( expectedConstructor1 ), Set.of("org.apache.httpcomponents:httpclient:4.5.3") );
+	protected Reporting expectedParam1 = new ReportEntry("param", HttpClient.class.getName( ), Collections.emptySet( ), Collections.emptySet( ) );
+	protected Reporting expectedConstructor1 = new ReportEntry("constructor", projectClass1.getName( ), Set.of( expectedParam1 ), Collections.emptySet( ) );
+	protected Reporting expected1 = new ReportEntry("class", projectClass1.getName( ), Set.of( expectedConstructor1 ), Set.of( httpClientGAV ) );
 	
-	protected Reporting expectedParam4c = new ReportEntry( "param", EmpiricalDistribution.class.getName( ), Collections.emptySet( ), Collections.emptySet() );	
-	protected Reporting expectedException4c = new ReportEntry( "exception", UnsupportedTypeException.class.getName( ), Collections.emptySet( ), Collections.emptySet() );	
-	protected Reporting expectedReturn4 = new ReportEntry("return", Wrapper.class.getName(), Collections.emptySet( ), Collections.emptySet() ); 
-	protected Reporting expectedMethod4 = new ReportEntry("method", "m", Set.of(expectedParam4c, expectedException4c, expectedReturn4 ), Collections.emptySet() );
-	protected Reporting expectedParam4a = new ReportEntry("param", Coin.class.getName(), Collections.emptySet(), Collections.emptySet());
-	protected Reporting expectedConstructor4 = new ReportEntry( "constructor", projectClass4.getName( ),  Set.of( expectedParam4a), Collections.emptySet() );
+	protected Reporting expectedParam4c = new ReportEntry( "param", EmpiricalDistribution.class.getName( ), Collections.emptySet( ), Collections.emptySet( ) );	
+	protected Reporting expectedException4c = new ReportEntry( "exception", UnsupportedTypeException.class.getName( ), Collections.emptySet( ), Collections.emptySet( ) );	
+	protected Reporting expectedReturn4 = new ReportEntry("return", Wrapper.class.getName( ), Collections.emptySet( ), Collections.emptySet( ) ); 
+	protected Reporting expectedMethod4 = new ReportEntry("method", "m", Set.of(expectedParam4c, expectedException4c, expectedReturn4 ), Collections.emptySet( ) );
+	protected Reporting expectedParam4a = new ReportEntry("param", Coin.class.getName( ), Collections.emptySet( ), Collections.emptySet( ));
+	protected Reporting expectedConstructor4 = new ReportEntry( "constructor", projectClass4.getName( ),  Set.of( expectedParam4a), Collections.emptySet( ) );
 	
-	protected Reporting expectedSuperType4 = new ReportEntry( "supertype", CoinSelection.class.getName( ), Collections.emptySet( ), Collections.emptySet() );	
-	protected Reporting expected4 = new ReportEntry("class", projectClass4.getName(),  Set.of(expectedSuperType4, expectedConstructor4, expectedMethod4), Set.of("de.huxhorn.sulky:de.huxhorn.sulky.generics:8.2.0", "org.apache.commons:commons-math:2.2", "jp.dodododo.janerics:janerics:1.0.1", "org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT"));
+	protected Reporting expectedSuperType4 = new ReportEntry( "supertype", CoinSelection.class.getName( ), Collections.emptySet( ), Collections.emptySet( ) );	
+	protected Reporting expected4 = new ReportEntry("class", projectClass4.getName( ),  Set.of(expectedSuperType4, expectedConstructor4, expectedMethod4), Set.of(genericsGAV, cmnsMathGAV, janericsGAV, bitcoinjGAV));
   
 	protected File aDependency;
 

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class AbiTest extends BaseAbiTest {
@@ -37,6 +38,12 @@ public class AbiTest extends BaseAbiTest {
 		super( );
 	}
 
+	@BeforeClass
+	public static void setUpOnce( ) throws Exception {
+
+		dependency4 = finder.findInCache( bitcoinjGAV ).orElse( artifact4Path ).toFile( );
+	}
+	
 	@Before
 	public void setUp( ) {
 
@@ -44,20 +51,17 @@ public class AbiTest extends BaseAbiTest {
 				this.definedDependencies,
 				new String[ ] { this.projectClassesSpecificPackage }, false, false );
 
-		this.classUnderTest = new Abi( conf );		
-
-		this.dependency4 = this.finder.findInCache(  "org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT" ).orElse( this.artifact4Path ).toFile( );
+		this.classUnderTest = new Abi( conf );
 	}
  
 	@Test
-	public void testInspectGroupsOneClassForFourDependencies( )
-			throws IOException {
+	public void testInspectGroupsOneClassForFourDependencies( ) {
 
 		Map<Class<?>, Set<String>> actualDependenciesMap = classUnderTest
 				.inspect( /* this.args  */ );
 
 		print( actualDependenciesMap );
 
-		assertTrue( this.expectedDependenciesForClass4.containsAll(actualDependenciesMap.get( projectClass4 )) || this.altDependenciesForClass4.containsAll(actualDependenciesMap.get( projectClass4 )) );
+		assertTrue( this.expectedDependenciesForClass4.containsAll( actualDependenciesMap.get( projectClass4 ) ) || this.altDependenciesForClass4.containsAll( actualDependenciesMap.get( projectClass4 ) ) );
 	}
 }

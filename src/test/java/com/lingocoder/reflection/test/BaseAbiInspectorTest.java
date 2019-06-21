@@ -29,36 +29,36 @@ import com.lingocoder.file.Lookup;
 
 public class BaseAbiInspectorTest extends BaseAbiCheckerTest {
 
-	protected File dependency1;
+	protected static File dependency1;
 
-	protected File dependency2;
+	protected static File dependency2;
 
-	protected File dependency3;
+	protected static File dependency3;
 
-	protected File dependency4;
+	protected static File dependency4;
 
-	protected File dependency5;
+	protected static File dependency5;
 
-	protected File dependency6;
+	protected static File dependency6;
 
-	protected File dependency7;
+	protected static File dependency7;
 
-	protected Set<?> allDependencies = Set.of( "org.apache.httpcomponents:httpclient:4.5.3", "junit:junit:4.12",
-			"com.fasterxml.jackson.core:jackson-annotations:2.9.8", "org.apache.commons:commons-lang3:3.5", "com.lingocoder:jarexec.plugin:0.3",
-			"org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT", "org.apache.commons:commons-math:2.2", "jp.dodododo.janerics:janerics:1.0.1",
-			"de.huxhorn.sulky:de.huxhorn.sulky.generics:8.2.0", "com.squareup.okhttp3:okhttp:3.12.3", 
-			"com.google.protobuf:protobuf-java:3.7.1","com.google.guava:guava:27.1-android", "org.bitcoinj:bitcoinj-core:0.16-SNAPSHOT" );
+	protected static Set<String> allDependencies = Set.of( httpClientGAV, junitGAV,
+			jacksonGAV, commonsLang3GAV, jarexecGAV,
+			bitcoinjGAV, cmnsMathGAV, janericsGAV,
+			genericsGAV, okHttpGAV, 
+			protobufGAV,guavaGAV, bitcoinj16GAV );
 
-	protected Set<?> expectedDependenciesForClass1 = Set.of( "org.apache.httpcomponents:httpclient:4.5.3" );
+	protected Set<?> expectedDependenciesForClass1 = Set.of( httpClientGAV );
 
-	protected Set<?> expectedDependenciesForClass2 = Set.of( "com.lingocoder:jarexec.plugin:0.3" );
+	protected Set<?> expectedDependenciesForClass2 = Set.of( jarexecGAV );
 
 	protected Set<?> expectedDependenciesForClass3 = Set
-			.of( "com.fasterxml.jackson.core:jackson-annotations:2.9.8" );
+			.of( jacksonGAV );
 
 	protected Set<?> expectedDependenciesForClass4 = Set.of(
-			"org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT", "org.apache.commons:commons-math:2.2", "jp.dodododo.janerics:janerics:1.0.1",
-			"de.huxhorn.sulky:de.huxhorn.sulky.generics:8.2.0" );
+			bitcoinjGAV, cmnsMathGAV, janericsGAV,
+			genericsGAV );
 
 	protected Set<?> altDependencies = Set.of( "httpclient", "unit",
 	"jackson-annotations", "commons-lang3", "jarexec.plugin",
@@ -78,40 +78,39 @@ public class BaseAbiInspectorTest extends BaseAbiCheckerTest {
 
 	protected static boolean isOnUnix = !System.getProperty("os.name").contains("Windows");  		
 
-  protected static final String GAV1;
-  protected static final String GAV2;    
-	protected static final String GAV3;
+    protected static final String GAV1;
+    protected static final String GAV2;    
+    protected static final String GAV3;
 	protected static final String GAV4;	   
 	protected static final String GAV5;
 	protected static final String GAV6;
 
+    protected static ClassPathFilter cpFilter;
+    protected static Set<String> gavs;
+	protected static Set<String> dependencies;
+	protected static Lookup<String> finder;
+	
 	static { 
 
-		GAV1 = isOnUnix ? "commons-math" : "org.apache.commons:commons-math:2.2";
-		GAV2 = isOnUnix ? "okhttp" : "com.squareup.okhttp3:okhttp:3.12.3";    
-		GAV3 = isOnUnix ? "protobuf-java" : "com.google.protobuf:protobuf-java:3.7.1";
-		GAV4 = isOnUnix ? "guava-27.1" : "com.google.guava:guava:27.1-android";	   
-		GAV5 = isOnUnix ? "bitcoinj-core" : "org.bitcoinj:bitcoinj-core:0.15-SNAPSHOT";
-		GAV6 = isOnUnix ? GAV5 : "org.bitcoinj:bitcoinj-core:0.16-SNAPSHOT";
+		GAV1 = isOnUnix ? "commons-math" : cmnsMathGAV;
+		GAV2 = isOnUnix ? "okhttp" : okHttpGAV;    
+		GAV3 = isOnUnix ? "protobuf-java" : protobufGAV;
+		GAV4 = isOnUnix ? "guava-27.1" : guavaGAV;	   
+		GAV5 = isOnUnix ? "bitcoinj-core" : bitcoinjGAV;
+		GAV6 = isOnUnix ? GAV5 : bitcoinj16GAV;
+		
+		gavs = new HashSet<>( );		
+		gavs.addAll( allDependencies );
+		cpFilter = new ClassPathFilter( );
+		dependencies = cpFilter.filterClassPath( gavs );
+		finder = new Lookup<>( dependencies );
 	}	
 
-  protected ClassPathFilter cpFilter;
-  protected Set<String> gavs;
-	protected Set<String> dependencies;
-	protected Lookup<String> finder;
-	
-	@SuppressWarnings("unchecked")		
 	protected BaseAbiInspectorTest( ) {
 				
-		this.allDependencPaths = Set.of( this.artifact1Path, this.artifact2Path,
-		this.artifact3Path, this.artifact4Path, this.artifact5Path,
-		this.artifact6Path, this.artifact7Path, this.artifact8Path );
-				
-		this.gavs = new HashSet<>( );
-		this.gavs.addAll( (Set<String>)this.allDependencies );
-		this.cpFilter = new ClassPathFilter( );
-		this.dependencies = this.cpFilter.filterClassPath( gavs );
-		this.finder = new Lookup<>( this.dependencies );
+		this.allDependencPaths = Set.of( artifact1Path, artifact2Path,
+		artifact3Path, artifact4Path, artifact5Path,
+		artifact6Path, artifact7Path, artifact8Path );
 	}
 	
 	protected void assertDependenciesGrouping( Set<?> expected,

@@ -34,18 +34,18 @@ import java.util.jar.JarFile;
 
 import org.apache.http.client.HttpClient;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.lingocoder.file.Lookup;
 import com.lingocoder.reflection.test.BaseAbiInspectorTest;
 
 public class JarAbiInspectorTest extends BaseAbiInspectorTest {
 
 	private AbiInspector<Set<String>, JarFile> classUnderTest;
 
-	private File aDependency;
-	
-	private Lookup<String> lookup;
+	private static File aDependency;
+
+	private static JarFile aModule;
 
 	private Set<String> allTypes = Set.of( String.class.getName( ),
 			HttpClient.class.getName( ), new byte[ 0 ].getClass( ).getName( ),
@@ -54,25 +54,28 @@ public class JarAbiInspectorTest extends BaseAbiInspectorTest {
 
 	private Set<String> expectedTypes = Set.of( HttpClient.class.getName( ) );
 
-	private String httpClientGAV = "org.apache.httpcomponents:httpclient:4.5.3";
-	
 	public JarAbiInspectorTest( ) {
 		super( );
 	}
 
+	@BeforeClass
+	public static void setUpOnce( ) throws Exception {
+		
+		aDependency = finder.findInCache( httpClientGAV ).orElse( artifact1Path ).toFile( );
+		
+		aModule = new JarFile( aDependency );		
+	}
+	
 	@Before
 	public void setUp( ) {
 
 		this.classUnderTest = new JarAbiInspector( );
-    this.lookup = new Lookup<>( this.cpFilter.filterClassPath( Set.of( httpClientGAV ) ) );
-		this.aDependency =  lookup.findInCache( httpClientGAV ).orElse( this.artifact1Path ).toFile( );
 	}
 
 	@Test
 	public void testInspectFindsPublicTypes( ) throws IOException {
 
-		Set<String> actualTypes = classUnderTest.inspect( projectClass1,
-				new JarFile( this.aDependency ) );
+		Set<String> actualTypes = classUnderTest.inspect( projectClass1, aModule );
 
 		assertTrue( actualTypes.equals( expectedTypes ) );
 
@@ -84,8 +87,7 @@ public class JarAbiInspectorTest extends BaseAbiInspectorTest {
 	@Test
 	public void testInspectDoesNotFindPublicTypes( ) throws IOException {
 
-		Set<String> actualTypes = classUnderTest.inspect( this.getClass( ),
-				new JarFile( this.aDependency ) );
+		Set<String> actualTypes = classUnderTest.inspect( this.getClass( ), aModule );
 
 		assertTrue( actualTypes.isEmpty( ) );
 	}
@@ -95,8 +97,7 @@ public class JarAbiInspectorTest extends BaseAbiInspectorTest {
 		final String[ ] foos = new String[ 3 ];
 		assertNull( foos[ 0 ] );
 		Set<String> cached = Set.of( "foo" );
-		JarFile givenJarFile = new JarFile( this.aDependency );
-		String pathName = givenJarFile.getName( );
+		String pathName = aModule.getName( );
 		final Map<String, Set<String>> mockCache = new ConcurrentHashMap<>( );
 		mockCache.put( pathName, cached );
 		Set<String> actual = new AbiInspector<Set<String>, JarFile>( ) {
@@ -113,7 +114,7 @@ public class JarAbiInspectorTest extends BaseAbiInspectorTest {
 					return classUnderTest.inspect( aProjectClass, aDependency );
 				}
 			}
-		}.inspect(this.getClass(), givenJarFile);
+		}.inspect(this.getClass(), aModule);
 		
 		assertEquals( "SUCCESS", foos[ 0 ] );
 		assertEquals( cached, actual );

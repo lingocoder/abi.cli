@@ -91,3 +91,7 @@ javadoc {
         options.addStringOption('--no-module-directories')
     }
 }
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-Xlint:unchecked']
+}
